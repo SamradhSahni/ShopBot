@@ -1,0 +1,412 @@
+[
+  {
+    "id": "A01",
+    "case_description": "Perfect Retrieval \u2192 Correct Answer",
+    "expected_case_type": "\u2705 Relevant retrieved \u2192 \u2705 Correct answer",
+    "question": "What is the return window for products at TechMart?",
+    "ground_truth": "30 days from delivery date",
+    "response": "The return window for products at TechMart is 30 days from the delivery date. Items must be in their original, unused condition and in original packaging with all accessories, manuals, and documentation included. A valid proof of purchase (order number or receipt) is required for all returns.\n\nIf you have any further questions or concerns, please don't hesitate to reach out to our customer support team. They will be happy to assist you with your inquiry.\n\nIf you have any other questions or concerns, please don't hesitate to reach out to our customer support team. They will be happy to assist you with your inquiry.\n\nIn addition, if you have any other questions or concerns, please don't hesitate to reach out to our customer support team. They will be happy to assist you with your inquiry.\n\nIf you have any other questions or concerns, please don't hesitate to reach out to our customer support team. They will be happy to assist you with your inquiry.\n\nIf you have any other questions or concerns, please don't hesitate to reach out to our customer support team. They will be happy to assist you with your inquiry.\n\nIf you have any other questions or concerns, please don't hesitate to reach out to our customer support team. They will be happy to assist you with your inquiry.\n\nIf you have any other questions or concerns, please don't hesitate to reach out to our customer support team. They will be happy to assist you with your inquiry.\n\nIf you have any other questions or concerns, please don't hesitate to reach out to our customer support team. They will be happy to assist you with your inquiry.\n\nIf you have any other questions or concerns, please don't hesitate to reach out to our customer support team. They will be happy to assist you with your inquiry.\n\nIf you have any other questions or concerns, please don't hesitate to reach out to our customer support team. They will be happy to assist you with your inquiry.\n\nIf you have any other questions or concerns, please don't hesitate to reach out to our customer support team. They will be happy to assist you with your inquiry.\n\nIf you have any other questions or concerns, please don't hesitate to reach out to our customer support team. They",
+    "retrieved_chunks": [
+      {
+        "source": "policies.md",
+        "type": "policy",
+        "similarity": 0.7542,
+        "preview": "- Photos of damage may be required for processing.\n\n### Return Process\n1. Log into your TechMart account and go to \"My Orders\".\n2. Select the order and click \"Initiate Return\".\n3. Choose the item(s) a"
+      },
+      {
+        "source": "policies.md",
+        "type": "policy",
+        "similarity": 0.7395,
+        "preview": "# TechMart Store Policies"
+      },
+      {
+        "source": "policies.md",
+        "type": "policy",
+        "similarity": 0.7017,
+        "preview": "## Return & Refund Policy\n\n### Standard Return Window\n- Customers may return eligible items within **30 days** of the delivery date.\n- Items must be in their **original, unused condition** and in **or"
+      }
+    ],
+    "retrieval_classification": "RELEVANT",
+    "retrieval_notes": "All expected sources retrieved: ['policies.md']",
+    "response_classification": "CORRECT",
+    "response_notes": "Key facts matched (4/4 tokens)",
+    "metrics": {
+      "retrieve_latency_ms": 2549,
+      "llm_latency_ms": 43441,
+      "total_latency_ms": 45990,
+      "tokens_used": 512,
+      "prompt_tokens": 650,
+      "chunks_retrieved": 3,
+      "top_similarity": 0.7542
+    }
+  },
+  {
+    "id": "A02",
+    "case_description": "Perfect Retrieval \u2192 Correct Answer",
+    "expected_case_type": "\u2705 Relevant retrieved \u2192 \u2705 Correct answer",
+    "question": "How much does express shipping cost?",
+    "ground_truth": "$9.99 USD, 2-3 business days",
+    "response": "Express shipping costs $9.99 USD.",
+    "retrieved_chunks": [
+      {
+        "source": "shipping_zones.json",
+        "type": "shipping",
+        "similarity": 0.7829,
+        "preview": "Domestic Shipping \u2014 Express Shipping: Delivery in 2-3 business days. Cost: $9.99 USD.  P.O. Box allowed: No. Cut-off time: 2:00 PM EST. Physical address required. Not available for all products."
+      },
+      {
+        "source": "shipping_zones.json",
+        "type": "shipping",
+        "similarity": 0.7373,
+        "preview": "International Shipping \u2014 Rest of World: Delivery in 14-21 business days. Cost: $39.99 USD. Carrier: DHL Express. Note: Customer responsible for all import duties and taxes."
+      },
+      {
+        "source": "shipping_zones.json",
+        "type": "shipping",
+        "similarity": 0.7322,
+        "preview": "International Shipping \u2014 Asia Pacific: Delivery in 10-18 business days. Cost: $34.99 USD. Carrier: FedEx International. Note: Customer responsible for all import duties and taxes."
+      }
+    ],
+    "retrieval_classification": "RELEVANT",
+    "retrieval_notes": "All expected sources retrieved: ['shipping_zones.json']",
+    "response_classification": "INCORRECT_OR_HALLUCINATED",
+    "response_notes": "Low match (0/2 tokens)",
+    "metrics": {
+      "retrieve_latency_ms": 3323,
+      "llm_latency_ms": 3241,
+      "total_latency_ms": 6565,
+      "tokens_used": 13,
+      "prompt_tokens": 635,
+      "chunks_retrieved": 3,
+      "top_similarity": 0.7829
+    }
+  },
+  {
+    "id": "A03",
+    "case_description": "Irrelevant Chunk Retrieved \u2192 LLM Still Correct",
+    "expected_case_type": "\u26a0\ufe0f Mixed retrieval \u2192 \u2705 LLM synthesises correctly",
+    "question": "What is the total cost of the Dell XPS 15 with express shipping?",
+    "ground_truth": "$1509.98 ($1499.99 + $9.99)",
+    "response": "The total cost of the Dell XPS 15 with express shipping is $1499.99 USD + $9.99 USD = $1509.99 USD.",
+    "retrieved_chunks": [
+      {
+        "source": "products.json",
+        "type": "product",
+        "similarity": 0.7371,
+        "preview": "Product: Dell XPS 15 Laptop. Category: Laptops. Price: $1499.99 USD. SKU: DELL-XPS15-13700H. Specifications: Intel Core i7-13700H, 16GB DDR5 RAM, 512GB NVMe SSD, NVIDIA RTX 4060 8GB, 15.6\" OLED 3.5K d"
+      },
+      {
+        "source": "shipping_zones.json",
+        "type": "shipping",
+        "similarity": 0.6929,
+        "preview": "Domestic Shipping \u2014 Express Shipping: Delivery in 2-3 business days. Cost: $9.99 USD.  P.O. Box allowed: No. Cut-off time: 2:00 PM EST. Physical address required. Not available for all products."
+      },
+      {
+        "source": "shipping_zones.json",
+        "type": "shipping",
+        "similarity": 0.6796,
+        "preview": "International Shipping \u2014 Rest of World: Delivery in 14-21 business days. Cost: $39.99 USD. Carrier: DHL Express. Note: Customer responsible for all import duties and taxes."
+      }
+    ],
+    "retrieval_classification": "RELEVANT",
+    "retrieval_notes": "All expected sources retrieved: ['products.json', 'shipping_zones.json']",
+    "response_classification": "CORRECT",
+    "response_notes": "Key facts matched (2/2 tokens)",
+    "metrics": {
+      "retrieve_latency_ms": 2330,
+      "llm_latency_ms": 5743,
+      "total_latency_ms": 8074,
+      "tokens_used": 48,
+      "prompt_tokens": 740,
+      "chunks_retrieved": 3,
+      "top_similarity": 0.7371
+    }
+  },
+  {
+    "id": "A04",
+    "case_description": "Good Retrieval \u2192 LLM Correct Answer",
+    "expected_case_type": "\u2705 Relevant retrieved \u2192 \u2705 Correct answer",
+    "question": "Can I return a defective item even after 30 days?",
+    "ground_truth": "Defective items must be reported within 7 days of delivery for free return",
+    "response": "Hi there! I'm happy to help you with your question.\n\nAccording to the return and refund policy, items that arrive damaged or defective within 7 days of delivery can be returned for a full refund or replacement at no extra cost. However, if the item arrives after 30 days, it may not be eligible for a return.\n\nIt's important to note that the return window for defective or damaged items is 7 days, not 30 days. If you have any questions or concerns about the return process, I would recommend contacting TechMart support for further assistance.\n\nIf you have any other questions or concerns, feel free to ask!",
+    "retrieved_chunks": [
+      {
+        "source": "faqs.md",
+        "type": "faq",
+        "similarity": 0.777,
+        "preview": "Question: Can I return an opened product?\nAnswer: Yes, as long as it's within 30 days and the product is in resalable condition with all original accessories. Opened software and digital codes are not"
+      },
+      {
+        "source": "policies.md",
+        "type": "policy",
+        "similarity": 0.773,
+        "preview": "## Return & Refund Policy\n\n### Standard Return Window\n- Customers may return eligible items within **30 days** of the delivery date.\n- Items must be in their **original, unused condition** and in **or"
+      },
+      {
+        "source": "policies.md",
+        "type": "policy",
+        "similarity": 0.7617,
+        "preview": "order systems cannot be returned unless defective.\n\n### Defective or Damaged Items\n- If an item arrives damaged or defective, contact us within **7 days** of delivery.\n- We will arrange a free return "
+      }
+    ],
+    "retrieval_classification": "RELEVANT",
+    "retrieval_notes": "All expected sources retrieved: ['policies.md']",
+    "response_classification": "CORRECT",
+    "response_notes": "Key facts matched (7/9 tokens)",
+    "metrics": {
+      "retrieve_latency_ms": 2116,
+      "llm_latency_ms": 11916,
+      "total_latency_ms": 14033,
+      "tokens_used": 151,
+      "prompt_tokens": 678,
+      "chunks_retrieved": 3,
+      "top_similarity": 0.777
+    }
+  },
+  {
+    "id": "A05",
+    "case_description": "No Relevant Context \u2192 LLM Should Admit Uncertainty",
+    "expected_case_type": "\ud83d\udeab Not in KB \u2192 \u2705 Model correctly uncertain OR \u274c Hallucinated",
+    "question": "What is the price of the iPhone 15 Pro?",
+    "ground_truth": "Not in knowledge base \u2014 model should say it doesn't have this info",
+    "response": "The price of the iPhone 15 Pro is $999.99 USD.",
+    "retrieved_chunks": [
+      {
+        "source": "products.json",
+        "type": "product",
+        "similarity": 0.7831,
+        "preview": "Product: Apple iPhone 15 Pro. Category: Smartphones. Price: $999.99 USD. SKU: APPLE-IP15PRO-256. Specifications: A17 Pro chip, 8GB RAM, 256GB storage, 48MP ProRAW camera, 6.1\" Super Retina XDR ProMoti"
+      },
+      {
+        "source": "products.json",
+        "type": "product",
+        "similarity": 0.7709,
+        "preview": "Product: Apple iPhone 15 Pro Max - 512GB/12GB. Category: Smartphones. Price: $1397.74 USD. SKU: APPLE-IPHONE-15-PRO-MAX-512GB-12GB. Specifications: Apple A17 Pro with 512GB-class NVMe storage; 6.7-inc"
+      },
+      {
+        "source": "products.json",
+        "type": "product",
+        "similarity": 0.7673,
+        "preview": "Product: Apple iPhone 15 Pro Max - 128GB/8GB. Category: Smartphones. Price: $1179.82 USD. SKU: APPLE-IPHONE-15-PRO-MAX-128GB-8GB. Specifications: Apple A17 Pro with fast NVMe storage; 6.7-inch ProMoti"
+      }
+    ],
+    "retrieval_classification": "NOT_APPLICABLE",
+    "retrieval_notes": "Expected source not in knowledge base",
+    "response_classification": "HALLUCINATED",
+    "response_notes": "Model gave a specific answer despite having no KB context",
+    "metrics": {
+      "retrieve_latency_ms": 2101,
+      "llm_latency_ms": 4485,
+      "total_latency_ms": 6587,
+      "tokens_used": 21,
+      "prompt_tokens": 872,
+      "chunks_retrieved": 3,
+      "top_similarity": 0.7831
+    }
+  },
+  {
+    "id": "A06",
+    "case_description": "Partial Retrieval \u2192 Partial Answer",
+    "expected_case_type": "\u26a0\ufe0f Partial retrieval \u2192 \u26a0\ufe0f Partial answer (depends on which products retrieved)",
+    "question": "Which product has the longest warranty at TechMart?",
+    "ground_truth": "ASUS ROG Monitor, Dell UltraSharp, WD Passport SSD all have 3-year warranty",
+    "response": "The longest warranty at TechMart is 3 years for most electronics. This is specified on each product page and is covered under the manufacturer's warranty. Additionally, TechMart Care extended warranty plans are available at checkout and extend coverage by 1 or 2 additional years beyond the manufacturer warranty, and may include accidental damage protection.\n\nIf you have any further questions or concerns, please don't hesitate to contact TechMart support.",
+    "retrieved_chunks": [
+      {
+        "source": "policies.md",
+        "type": "policy",
+        "similarity": 0.7902,
+        "preview": "## Warranty Policy\n\n### Manufacturer Warranty\n- All TechMart products are covered by the **manufacturer's warranty** as specified on each product page.\n- Warranty periods vary by product (see product "
+      },
+      {
+        "source": "faqs.md",
+        "type": "faq",
+        "similarity": 0.7726,
+        "preview": "Question: Does TechMart offer its own extended warranty?\nAnswer: Yes, TechMart Care extended warranty plans are available at checkout. They extend coverage by 1\u20132 additional years and may include acci"
+      },
+      {
+        "source": "policies.md",
+        "type": "policy",
+        "similarity": 0.7419,
+        "preview": "sical damage, water damage, or damage from misuse.\n\n### Extended Warranty (TechMart Care)\n- Extended warranty plans are available at checkout for most electronics.\n- Plans extend coverage by 1 or 2 ad"
+      }
+    ],
+    "retrieval_classification": "MISSED",
+    "retrieval_notes": "None of expected sources (['products.json']) in retrieved: ['policies.md', 'faqs.md', 'policies.md']",
+    "response_classification": "PARTIAL",
+    "response_notes": "Partially correct (3/8 tokens matched)",
+    "metrics": {
+      "retrieve_latency_ms": 2087,
+      "llm_latency_ms": 9341,
+      "total_latency_ms": 11429,
+      "tokens_used": 105,
+      "prompt_tokens": 738,
+      "chunks_retrieved": 3,
+      "top_similarity": 0.7902
+    }
+  },
+  {
+    "id": "A07",
+    "case_description": "Good Context \u2192 LLM Hallucinates Despite Context",
+    "expected_case_type": "\u2705 Relevant retrieved \u2192 \u274c Possible hallucination check",
+    "question": "Do you offer same-day delivery?",
+    "ground_truth": "No, fastest is Overnight (next business day, $24.99)",
+    "response": "Yes, we do offer same-day delivery for orders placed before 2:00 PM EST on business days. However, please note that this service is subject to availability and may not be available on weekends or holidays. Additionally, free standard shipping is automatically applied when the cart total exceeds $50. If you have any questions about our shipping policies or would like to request a quote for a specific order, please feel free to ask.",
+    "retrieved_chunks": [
+      {
+        "source": "policies.md",
+        "type": "policy",
+        "similarity": 0.6758,
+        "preview": "Overnight Shipping | Next business day | $24.99 |\n\n- Orders placed before **2:00 PM EST** on business days ship same day.\n- Orders placed after 2:00 PM or on weekends ship the next business day.\n- Fre"
+      },
+      {
+        "source": "shipping_zones.json",
+        "type": "shipping",
+        "similarity": 0.6398,
+        "preview": "Domestic Shipping \u2014 Overnight Shipping: Delivery in 1 business day. Cost: $24.99 USD.  P.O. Box allowed: No. Cut-off time: 12:00 PM EST. Must order before 12PM EST. Not available on Fridays for Saturd"
+      },
+      {
+        "source": "faqs.md",
+        "type": "faq",
+        "similarity": 0.6239,
+        "preview": "Question: Can I use multiple discount codes on one order?\nAnswer: Only one discount code can be applied per order. Gift cards can be combined with a discount code.\n\n---\n\n## Shipping & Delivery"
+      }
+    ],
+    "retrieval_classification": "RELEVANT",
+    "retrieval_notes": "All expected sources retrieved: ['shipping_zones.json']",
+    "response_classification": "INCORRECT_OR_HALLUCINATED",
+    "response_notes": "Low match (1/4 tokens)",
+    "metrics": {
+      "retrieve_latency_ms": 2144,
+      "llm_latency_ms": 9151,
+      "total_latency_ms": 11296,
+      "tokens_used": 98,
+      "prompt_tokens": 671,
+      "chunks_retrieved": 3,
+      "top_similarity": 0.6758
+    }
+  },
+  {
+    "id": "A08",
+    "case_description": "Multi-source Retrieval \u2192 Complex Correct Answer",
+    "expected_case_type": "\u2705 Relevant retrieved \u2192 \u2705 Correct multi-fact answer",
+    "question": "What payment methods are accepted and is there a financing option?",
+    "ground_truth": "Visa, Mastercard, Amex, PayPal, Apple/Google Pay, Gift Cards, Affirm (0% APR 6 months on $200+)",
+    "response": "We accept Visa, Mastercard, American Express, Discover, PayPal, Apple Pay, Google Pay, TechMart Gift Cards, and Affirm (Buy Now Pay Later). Yes, through Affirm, eligible customers can get 0% APR for 6 months on orders over $200. Available at checkout.",
+    "retrieved_chunks": [
+      {
+        "source": "faqs.md",
+        "type": "faq",
+        "similarity": 0.7367,
+        "preview": "Question: What payment methods do you accept?\nAnswer: We accept Visa, Mastercard, American Express, Discover, PayPal, Apple Pay, Google Pay, TechMart Gift Cards, and Affirm (Buy Now Pay Later)."
+      },
+      {
+        "source": "policies.md",
+        "type": "policy",
+        "similarity": 0.6831,
+        "preview": "## Payment Policy\n\n### Accepted Payment Methods\n- Visa, Mastercard, American Express, Discover\n- PayPal and PayPal Credit\n- Apple Pay and Google Pay\n- TechMart Gift Cards and Store Credit\n- Affirm (Bu"
+      },
+      {
+        "source": "faqs.md",
+        "type": "faq",
+        "similarity": 0.6159,
+        "preview": "Question: Do you offer financing or instalment payments?\nAnswer: Yes, through Affirm. Eligible customers can get 0% APR for 6 months on orders over $200. Available at checkout."
+      }
+    ],
+    "retrieval_classification": "RELEVANT",
+    "retrieval_notes": "All expected sources retrieved: ['policies.md']",
+    "response_classification": "CORRECT",
+    "response_notes": "Key facts matched (9/10 tokens)",
+    "metrics": {
+      "retrieve_latency_ms": 2103,
+      "llm_latency_ms": 7952,
+      "total_latency_ms": 10056,
+      "tokens_used": 76,
+      "prompt_tokens": 653,
+      "chunks_retrieved": 3,
+      "top_similarity": 0.7367
+    }
+  },
+  {
+    "id": "A09",
+    "case_description": "Retrieval Miss \u2192 Missing Important Info",
+    "expected_case_type": "\u26a0\ufe0f Context may include/miss PO Box detail \u2192 varies",
+    "question": "Can I ship to a P.O. Box with express shipping?",
+    "ground_truth": "No, P.O. Boxes only allowed for standard shipping, not express or overnight",
+    "response": "Hi there! I'm happy to help you with your question about shipping to a P.O. Box with express shipping.\n\nAccording to the store information provided, standard shipping can deliver to P.O. Boxes. However, express shipping requires a physical address. Therefore, it is not possible to ship to a P.O. Box with express shipping.\n\nIf you have any other questions or concerns about shipping, I'd be happy to help. Additionally, if you have any issues with your order, please don't hesitate to contact our support team. They'll be able to assist you with any questions or concerns you may have.\n\nThank you for reaching out to us!",
+    "retrieved_chunks": [
+      {
+        "source": "faqs.md",
+        "type": "faq",
+        "similarity": 0.8287,
+        "preview": "Question: Can I ship to a P.O. Box?\nAnswer: Standard shipping can deliver to P.O. Boxes. Express and Overnight shipping require a physical address."
+      },
+      {
+        "source": "shipping_zones.json",
+        "type": "shipping",
+        "similarity": 0.7135,
+        "preview": "Domestic Shipping \u2014 Express Shipping: Delivery in 2-3 business days. Cost: $9.99 USD.  P.O. Box allowed: No. Cut-off time: 2:00 PM EST. Physical address required. Not available for all products."
+      },
+      {
+        "source": "shipping_zones.json",
+        "type": "shipping",
+        "similarity": 0.6145,
+        "preview": "Shipping restrictions: Signature required on orders over $500. Domestic carriers: UPS, FedEx, USPS. Order tracking is available for All orders via email and SMS notification."
+      }
+    ],
+    "retrieval_classification": "RELEVANT",
+    "retrieval_notes": "All expected sources retrieved: ['shipping_zones.json']",
+    "response_classification": "PARTIAL",
+    "response_notes": "Partially correct (4/7 tokens matched)",
+    "metrics": {
+      "retrieve_latency_ms": 2114,
+      "llm_latency_ms": 12297,
+      "total_latency_ms": 14411,
+      "tokens_used": 154,
+      "prompt_tokens": 623,
+      "chunks_retrieved": 3,
+      "top_similarity": 0.8287
+    }
+  },
+  {
+    "id": "A10",
+    "case_description": "Live Data Required \u2192 Model Should Defer",
+    "expected_case_type": "\ud83d\udeab Requires live data \u2192 \u2705 Model correctly defers OR \u274c Hallucinated status",
+    "question": "What is the current status of my order number 98765?",
+    "ground_truth": "Cannot access live order data \u2014 should direct to My Orders or support",
+    "response": "Hello! I'm happy to help you with your question about your order number 98765.\n\nTo check the status of your order, you can log into your account and go to \"My Orders.\" If you don't have an account, you can also contact our customer support team and provide your order number to check the status.\n\nIf you have any further questions or concerns about your order, please don't hesitate to ask. We're here to help and want to make sure you have a positive shopping experience with us.\n\nIn the meantime, if you're looking for a way to track your order, you can also check the tracking number that was emailed to you as soon as your order shipped. You can also log into your account and go to \"My Orders\" to see real-time tracking updates for all domestic orders.\n\nIf you have any questions about product availability, you can also check the availability of the product on the product page. \"In Stock\" means the product is ready to ship, \"Low Stock\" means there are limited units available, and \"Out of Stock\" means the product is currently unavailable.\n\nI hope this information helps you with your question. If you have any further questions, please don't hesitate to ask.",
+    "retrieved_chunks": [
+      {
+        "source": "policies.md",
+        "type": "policy",
+        "similarity": 0.6553,
+        "preview": "pped internationally due to regional restrictions.\n\n### Order Tracking\n- A tracking number is emailed as soon as your order ships.\n- Track your order at any time via \"My Orders\" in your account or dir"
+      },
+      {
+        "source": "faqs.md",
+        "type": "faq",
+        "similarity": 0.643,
+        "preview": "Question: How do I track my order?\nAnswer: Once your order ships, you'll receive a tracking number via email. You can also log into your account and go to \"My Orders\" to see real-time tracking."
+      },
+      {
+        "source": "faqs.md",
+        "type": "faq",
+        "similarity": 0.6081,
+        "preview": "Question: How do I know if a product is in stock?\nAnswer: Product availability is shown on each product page. \"In Stock\" means ready to ship, \"Low Stock\" means limited units available, and \"Out of Sto"
+      }
+    ],
+    "retrieval_classification": "NOT_APPLICABLE",
+    "retrieval_notes": "Expected source not in knowledge base",
+    "response_classification": "CORRECTLY_UNCERTAIN",
+    "response_notes": "Model correctly admitted lack of information",
+    "metrics": {
+      "retrieve_latency_ms": 2131,
+      "llm_latency_ms": 20618,
+      "total_latency_ms": 22751,
+      "tokens_used": 281,
+      "prompt_tokens": 649,
+      "chunks_retrieved": 3,
+      "top_similarity": 0.6553
+    }
+  }
+]

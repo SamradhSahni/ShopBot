@@ -1,0 +1,8 @@
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+.env
+chroma_db/
+*.log
+.git

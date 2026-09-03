@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ShopBot AI — TechMart Support</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-primary:    #0a0f1e;
+      --bg-secondary:  #111827;
+      --bg-card:       #1a2235;
+      --bg-input:      #141c2e;
+      --accent:        #6366f1;
+      --accent-light:  #818cf8;
+      --accent-glow:   rgba(99, 102, 241, 0.25);
+      --text-primary:  #f1f5f9;
+      --text-secondary:#94a3b8;
+      --text-muted:    #475569;
+      --border:        rgba(99,102,241,0.2);
+      --user-bubble:   #4f46e5;
+      --bot-bubble:    #1e293b;
+      --success:       #10b981;
+      --warning:       #f59e0b;
+      --error:         #ef4444;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      backdrop-filter: blur(10px);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent), #a855f7);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .header-title {
+      font-size: 18px;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--accent-light), #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      animation: pulse 2s infinite;
+    }
+    .status-dot.connected { background: var(--success); }
+    .status-dot.error { background: var(--error); animation: none; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* ── Model Selector ── */
+    .model-selector {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .model-label {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    select#modelSelect {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      outline: none;
+    }
+
+    /* ── Main Layout ── */
+    main {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 260px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    .sidebar-section h3 {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .quick-btn {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      margin-bottom: 6px;
+      transition: all 0.2s ease;
+      line-height: 1.4;
+    }
+
+    .quick-btn:hover {
+      background: var(--accent-glow);
+      border-color: var(--accent);
+      color: var(--text-primary);
+      transform: translateX(2px);
+    }
+
+    .stats-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 12px;
+    }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-label { color: var(--text-muted); }
+    .stat-value { color: var(--accent-light); font-weight: 600; }
+
+    /* ── Chat Area ── */
+    .chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #chatMessages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      scroll-behavior: smooth;
+    }
+
+    #chatMessages::-webkit-scrollbar { width: 4px; }
+    #chatMessages::-webkit-scrollbar-track { background: transparent; }
+    #chatMessages::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 4px; }
+
+    /* ── Messages ── */
+    .message {
+      display: flex;
+      gap: 12px;
+      max-width: 80%;
+      animation: fadeSlideIn 0.3s ease;
+    }
+
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.user { align-self: flex-end; flex-direction: row-reverse; }
+    .message.bot  { align-self: flex-start; }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .message.user .avatar {
+      background: linear-gradient(135deg, var(--accent), #7c3aed);
+    }
+    .message.bot .avatar {
+      background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+    }
+
+    .bubble {
+      padding: 14px 18px;
+      border-radius: 18px;
+      font-size: 14px;
+      line-height: 1.6;
+      max-width: 100%;
+    }
+
+    .message.user .bubble {
+      background: var(--user-bubble);
+      border-bottom-right-radius: 4px;
+      color: #fff;
+    }
+
+    .message.bot .bubble {
+      background: var(--bot-bubble);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
+      color: var(--text-primary);
+    }
+
+    .bubble .meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .meta-chip {
+      background: rgba(99,102,241,0.12);
+      padding: 2px 8px;
+      border-radius: 10px;
+      color: var(--accent-light);
+    }
+
+    /* ── Typing Indicator ── */
+    .typing-indicator {
+      display: flex;
+      gap: 5px;
+      padding: 14px 18px;
+      background: var(--bot-bubble);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      border-bottom-left-radius: 4px;
+      width: fit-content;
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: typingBounce 1.2s infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typingBounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-8px); }
+    }
+
+    /* ── Welcome Message ── */
+    .welcome {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-secondary);
+    }
+    .welcome .icon {
+      font-size: 56px;
+      margin-bottom: 16px;
+    }
+    .welcome h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .welcome p {
+      font-size: 14px;
+      max-width: 420px;
+      margin: 0 auto 24px;
+      line-height: 1.6;
+    }
+    .welcome-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+    .chip {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .chip:hover {
+      background: var(--accent-glow);
+      border-color: var(--accent);
+      color: var(--text-primary);
+    }
+
+    /* ── Input Area ── */
+    .input-area {
+      padding: 16px 24px 20px;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+    }
+
+    .input-wrapper {
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px 12px 12px 18px;
+      transition: border-color 0.2s;
+    }
+    .input-wrapper:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    #userInput {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      resize: none;
+      max-height: 120px;
+      min-height: 22px;
+      line-height: 1.5;
+    }
+    #userInput::placeholder { color: var(--text-muted); }
+
+    #sendBtn {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), #7c3aed);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    #sendBtn:hover { transform: scale(1.05); box-shadow: 0 4px 15px var(--accent-glow); }
+    #sendBtn:active { transform: scale(0.97); }
+    #sendBtn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    #sendBtn svg { width: 18px; height: 18px; fill: white; }
+
+    .input-hint {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header>
+  <div class="header-left">
+    <div class="logo">🛒</div>
+    <div>
+      <div class="header-title">ShopBot AI</div>
+      <div class="header-subtitle">TechMart Customer Support</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:12px;align-items:center;">
+    <div class="model-selector">
+      <span class="model-label">Model:</span>
+      <select id="modelSelect">
+        <option value="codellama">Code Llama</option>
+        <option value="starcoder2">StarCoder2</option>
+        <option value="deepseek-coder">DeepSeek-Coder</option>
+      </select>
+    </div>
+    <div class="status-badge">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">Connecting…</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <h3>Quick Questions</h3>
+      <button class="quick-btn" onclick="sendQuick(this)">What's the return policy?</button>
+      <button class="quick-btn" onclick="sendQuick(this)">How much is express shipping?</button>
+      <button class="quick-btn" onclick="sendQuick(this)">Tell me about the Dell XPS 15 laptop</button>
+      <button class="quick-btn" onclick="sendQuick(this)">What payment methods do you accept?</button>
+      <button class="quick-btn" onclick="sendQuick(this)">How do I track my order?</button>
+      <button class="quick-btn" onclick="sendQuick(this)">What warranty does the Sony headphones have?</button>
+    </div>
+
+    <div class="sidebar-section">
+      <h3>Session Stats</h3>
+      <div class="stats-card">
+        <div class="stat-row">
+          <span class="stat-label">Messages</span>
+          <span class="stat-value" id="statMessages">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Avg Latency</span>
+          <span class="stat-value" id="statLatency">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Tokens Used</span>
+          <span class="stat-value" id="statTokens">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Model</span>
+          <span class="stat-value" id="statModel">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <h3>Exercise Info</h3>
+      <div class="stats-card">
+        <div class="stat-row">
+          <span class="stat-label">Stage</span>
+          <span class="stat-value">W3 — Ex 1</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Pipeline</span>
+          <span class="stat-value" style="font-size:10px;">User→API→Ollama→LLM</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">RAG</span>
+          <span class="stat-value" style="color:var(--warning);">Off</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Chat ── -->
+  <div class="chat-container">
+    <div id="chatMessages">
+      <div class="welcome" id="welcomeMsg">
+        <div class="icon">🤖</div>
+        <h2>Hi, I'm ShopBot!</h2>
+        <p>Your AI-powered assistant for TechMart. Ask me about products, prices, shipping, returns, or anything else you need help with.</p>
+        <div class="welcome-chips">
+          <div class="chip" onclick="sendQuick(this)">Laptop recommendations</div>
+          <div class="chip" onclick="sendQuick(this)">Return policy</div>
+          <div class="chip" onclick="sendQuick(this)">Shipping options</div>
+          <div class="chip" onclick="sendQuick(this)">Warranty info</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-wrapper">
+        <textarea
+          id="userInput"
+          rows="1"
+          placeholder="Ask about products, shipping, returns…"
+        ></textarea>
+        <button id="sendBtn" onclick="sendMessage()" title="Send">
+          <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+      </div>
+      <div class="input-hint">Press <kbd style="background:var(--bg-card);padding:1px 5px;border-radius:4px;border:1px solid var(--border);">Enter</kbd> to send · <kbd style="background:var(--bg-card);padding:1px 5px;border-radius:4px;border:1px solid var(--border);">Shift+Enter</kbd> for new line</div>
+    </div>
+  </div>
+</main>
+
+<script>
+  // ── State ──────────────────────────────────────────────────────────────────
+  let sessionMessages = 0;
+  let totalLatency = 0;
+  let totalTokens = 0;
+  let isWaiting = false;
+
+  // ── Health Check ───────────────────────────────────────────────────────────
+  async function checkHealth() {
+    try {
+      const res = await fetch('/health');
+      const data = await res.json();
+      const dot = document.getElementById('statusDot');
+      const txt = document.getElementById('statusText');
+      if (data.ollama_connected) {
+        dot.className = 'status-dot connected';
+        txt.textContent = 'Ollama Connected';
+      } else {
+        dot.className = 'status-dot error';
+        txt.textContent = 'Ollama Offline';
+      }
+    } catch {
+      document.getElementById('statusDot').className = 'status-dot error';
+      document.getElementById('statusText').textContent = 'Server Error';
+    }
+  }
+  checkHealth();
+  setInterval(checkHealth, 15000);
+
+  // ── Auto-resize textarea ───────────────────────────────────────────────────
+  const input = document.getElementById('userInput');
+  input.addEventListener('input', () => {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+  });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  // ── Quick buttons ──────────────────────────────────────────────────────────
+  function sendQuick(el) {
+    document.getElementById('userInput').value = el.textContent.trim();
+    sendMessage();
+  }
+
+  // ── Append message ─────────────────────────────────────────────────────────
+  function appendMessage(role, text, meta = null) {
+    const welcome = document.getElementById('welcomeMsg');
+    if (welcome) welcome.remove();
+
+    const container = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = `message ${role}`;
+
+    const avatar = role === 'user' ? '👤' : '🤖';
+    let metaHTML = '';
+    if (meta) {
+      metaHTML = `<div class="meta">
+        <span class="meta-chip">${meta.model}</span>
+        <span>${meta.latency_ms}ms</span>
+        <span>${meta.tokens_used} tokens</span>
+      </div>`;
+    }
+
+    div.innerHTML = `
+      <div class="avatar">${avatar}</div>
+      <div class="bubble">${text.replace(/\n/g, '<br>')}${metaHTML}</div>
+    `;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+    return div;
+  }
+
+  function appendTyping() {
+    const welcome = document.getElementById('welcomeMsg');
+    if (welcome) welcome.remove();
+
+    const container = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = 'message bot';
+    div.id = 'typingIndicator';
+    div.innerHTML = `
+      <div class="avatar">🤖</div>
+      <div class="typing-indicator">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>`;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  // ── Update stats ───────────────────────────────────────────────────────────
+  function updateStats(data) {
+    sessionMessages++;
+    totalLatency += data.latency_ms;
+    totalTokens += data.tokens_used;
+    document.getElementById('statMessages').textContent = sessionMessages;
+    document.getElementById('statLatency').textContent = Math.round(totalLatency / sessionMessages) + 'ms';
+    document.getElementById('statTokens').textContent = totalTokens;
+    document.getElementById('statModel').textContent = data.model;
+  }
+
+  // ── Send message ───────────────────────────────────────────────────────────
+  async function sendMessage() {
+    if (isWaiting) return;
+    const inputEl = document.getElementById('userInput');
+    const message = inputEl.value.trim();
+    if (!message) return;
+
+    const model = document.getElementById('modelSelect').value;
+
+    inputEl.value = '';
+    inputEl.style.height = 'auto';
+    isWaiting = true;
+    document.getElementById('sendBtn').disabled = true;
+
+    appendMessage('user', message);
+    appendTyping();
+
+    try {
+      const res = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, model }),
+      });
+      const data = await res.json();
+
+      document.getElementById('typingIndicator')?.remove();
+
+      if (data.error) {
+        appendMessage('bot', '⚠️ ' + data.response);
+      } else {
+        appendMessage('bot', data.response, {
+          model: data.model,
+          latency_ms: data.latency_ms,
+          tokens_used: data.tokens_used,
+        });
+        updateStats(data);
+      }
+    } catch (err) {
+      document.getElementById('typingIndicator')?.remove();
+      appendMessage('bot', '❌ Failed to reach ShopBot. Please check the server is running.');
+    } finally {
+      isWaiting = false;
+      document.getElementById('sendBtn').disabled = false;
+      inputEl.focus();
+    }
+  }
+</script>
+</body>
+</html>

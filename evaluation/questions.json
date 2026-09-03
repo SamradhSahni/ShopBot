@@ -1,0 +1,231 @@
+[
+  {
+    "id": "Q01",
+    "category": "Product Information",
+    "question": "What are the specifications of the Dell XPS 15 laptop?",
+    "ground_truth": "Intel Core i7-13700H, 16GB DDR5 RAM, 512GB NVMe SSD, NVIDIA RTX 4060 8GB, 15.6 inch OLED 3.5K display",
+    "requires_rag": true,
+    "source_doc": "products.json",
+    "hallucination_trap": false
+  },
+  {
+    "id": "Q02",
+    "category": "Product Information",
+    "question": "How much does the Sony WH-1000XM5 headphones cost?",
+    "ground_truth": "$349.99 USD",
+    "requires_rag": true,
+    "source_doc": "products.json",
+    "hallucination_trap": false
+  },
+  {
+    "id": "Q03",
+    "category": "Product Information",
+    "question": "Which laptops are currently in stock at TechMart?",
+    "ground_truth": "Dell XPS 15, Apple MacBook Pro 14 inch, and Lenovo ThinkPad E15 are all in stock",
+    "requires_rag": true,
+    "source_doc": "products.json",
+    "hallucination_trap": false
+  },
+  {
+    "id": "Q04",
+    "category": "Product Information",
+    "question": "What is the warranty on the Samsung 65 inch QLED TV?",
+    "ground_truth": "1 year manufacturer warranty",
+    "requires_rag": true,
+    "source_doc": "products.json",
+    "hallucination_trap": false
+  },
+  {
+    "id": "Q05",
+    "category": "Product Information",
+    "question": "What is the customer rating of the Sony WH-1000XM5 headphones?",
+    "ground_truth": "4.9 out of 5",
+    "requires_rag": true,
+    "source_doc": "products.json",
+    "hallucination_trap": false
+  },
+  {
+    "id": "Q06",
+    "category": "Return Policy",
+    "question": "Can I return a laptop I have already opened?",
+    "ground_truth": "Yes, if returned within 30 days and in resalable condition with all original accessories",
+    "requires_rag": true,
+    "source_doc": "policies.md",
+    "hallucination_trap": false
+  },
+  {
+    "id": "Q07",
+    "category": "Return Policy",
+    "question": "How many days do I have to return a product?",
+    "ground_truth": "30 days from the delivery date",
+    "requires_rag": true,
+    "source_doc": "policies.md",
+    "hallucination_trap": false
+  },
+  {
+    "id": "Q08",
+    "category": "Return Policy",
+    "question": "Are digital downloads and software licenses refundable?",
+    "ground_truth": "No, opened software licenses and digital download codes are non-refundable",
+    "requires_rag": true,
+    "source_doc": "policies.md",
+    "hallucination_trap": false
+  },
+  {
+    "id": "Q09",
+    "category": "Return Policy",
+    "question": "How long does it take to receive a refund after returning a product?",
+    "ground_truth": "Refunds are processed within 5 to 7 business days after receiving the return, with an additional 3 to 5 business days for credit card refunds",
+    "requires_rag": true,
+    "source_doc": "policies.md",
+    "hallucination_trap": false
+  },
+  {
+    "id": "Q10",
+    "category": "Return Policy",
+    "question": "What condition must a product be in for a return to be accepted?",
+    "ground_truth": "Original unused condition with all accessories, manuals, and original packaging included",
+    "requires_rag": true,
+    "source_doc": "policies.md",
+    "hallucination_trap": false
+  },
+  {
+    "id": "Q11",
+    "category": "Shipping",
+    "question": "How much does express shipping cost?",
+    "ground_truth": "$9.99 USD for 2 to 3 business day delivery",
+    "requires_rag": true,
+    "source_doc": "shipping_zones.json",
+    "hallucination_trap": false
+  },
+  {
+    "id": "Q12",
+    "category": "Shipping",
+    "question": "What is the minimum order value for free shipping?",
+    "ground_truth": "$50 USD. Orders over $50 receive free standard shipping",
+    "requires_rag": true,
+    "source_doc": "shipping_zones.json",
+    "hallucination_trap": false
+  },
+  {
+    "id": "Q13",
+    "category": "Shipping",
+    "question": "How long does standard shipping take?",
+    "ground_truth": "5 to 7 business days",
+    "requires_rag": true,
+    "source_doc": "shipping_zones.json",
+    "hallucination_trap": false
+  },
+  {
+    "id": "Q14",
+    "category": "Shipping",
+    "question": "Does TechMart ship internationally?",
+    "ground_truth": "Yes, TechMart ships to 40+ countries worldwide including Europe, Asia Pacific, Canada, Mexico, and rest of world",
+    "requires_rag": true,
+    "source_doc": "shipping_zones.json",
+    "hallucination_trap": false
+  },
+  {
+    "id": "Q15",
+    "category": "Shipping",
+    "question": "What is the fastest shipping option and how much does it cost?",
+    "ground_truth": "Overnight shipping at $24.99, delivers next business day for orders placed before 12PM EST",
+    "requires_rag": true,
+    "source_doc": "shipping_zones.json",
+    "hallucination_trap": false
+  },
+  {
+    "id": "Q16",
+    "category": "Cross-domain",
+    "question": "What is the total cost of buying the Dell XPS 15 laptop with overnight shipping?",
+    "ground_truth": "$1524.98 USD ($1499.99 + $24.99 overnight shipping)",
+    "requires_rag": true,
+    "source_doc": "products.json + shipping_zones.json",
+    "hallucination_trap": false
+  },
+  {
+    "id": "Q17",
+    "category": "Cross-domain",
+    "question": "If I order the Sony WH-1000XM5 headphones today with express shipping, when will they arrive?",
+    "ground_truth": "In 2 to 3 business days, assuming order placed before 2PM EST on a business day",
+    "requires_rag": true,
+    "source_doc": "products.json + shipping_zones.json",
+    "hallucination_trap": false
+  },
+  {
+    "id": "Q18",
+    "category": "Cross-domain",
+    "question": "Can I return the Samsung TV if I opened it but it arrived defective?",
+    "ground_truth": "Yes, defective items can be returned within 7 days of delivery regardless of opened condition, with free return shipping arranged",
+    "requires_rag": true,
+    "source_doc": "policies.md",
+    "hallucination_trap": false
+  },
+  {
+    "id": "Q19",
+    "category": "Cross-domain",
+    "question": "What payment methods are accepted for international orders?",
+    "ground_truth": "Visa, Mastercard, American Express, Discover, PayPal, Apple Pay, Google Pay, TechMart Gift Cards, and Affirm",
+    "requires_rag": true,
+    "source_doc": "policies.md",
+    "hallucination_trap": false
+  },
+  {
+    "id": "Q20",
+    "category": "Cross-domain",
+    "question": "Which product has the best value considering price and warranty length?",
+    "ground_truth": "The ASUS ROG Monitor and Dell UltraSharp Monitor both offer 3 years warranty. The Dell XPS 15 offers 2 years warranty. The WD Passport SSD offers 3 years warranty at $129.99.",
+    "requires_rag": true,
+    "source_doc": "products.json",
+    "hallucination_trap": false
+  },
+  {
+    "id": "Q21",
+    "category": "Hallucination Trap",
+    "question": "What is the price of the iPhone 15 Pro at TechMart?",
+    "ground_truth": "The model should state it does not have this information. Apple iPhone 15 Pro is NOT listed in TechMart catalogue (only Samsung Galaxy S24 Ultra and Google Pixel 8 are listed as smartphones).",
+    "requires_rag": true,
+    "source_doc": "NOT_IN_KB",
+    "hallucination_trap": true,
+    "trap_type": "product_not_in_catalogue"
+  },
+  {
+    "id": "Q22",
+    "category": "Hallucination Trap",
+    "question": "Do you offer same-day delivery?",
+    "ground_truth": "The model should say no, TechMart does not offer same-day delivery. Fastest option is Overnight (next business day).",
+    "requires_rag": true,
+    "source_doc": "shipping_zones.json",
+    "hallucination_trap": true,
+    "trap_type": "policy_not_offered"
+  },
+  {
+    "id": "Q23",
+    "category": "Hallucination Trap",
+    "question": "What is TechMart's data privacy policy regarding selling customer data to advertisers?",
+    "ground_truth": "The model should state that customer data is never sold to third parties, based on the privacy section in policies.md",
+    "requires_rag": true,
+    "source_doc": "policies.md",
+    "hallucination_trap": false
+  },
+  {
+    "id": "Q24",
+    "category": "Hallucination Trap",
+    "question": "Can I get a bulk discount if I buy 5 laptops?",
+    "ground_truth": "The model should say it does not have information about bulk discounts in its knowledge base and suggest contacting support",
+    "requires_rag": true,
+    "source_doc": "NOT_IN_KB",
+    "hallucination_trap": true,
+    "trap_type": "policy_not_in_kb"
+  },
+  {
+    "id": "Q25",
+    "category": "Hallucination Trap",
+    "question": "What happened to my order number 12345? Can you check the status?",
+    "ground_truth": "The model should clarify it cannot access real-time order data and direct the user to My Orders in their account or customer support",
+    "requires_rag": false,
+    "source_doc": "NOT_IN_KB",
+    "hallucination_trap": true,
+    "trap_type": "requires_live_data"
+  }
+]

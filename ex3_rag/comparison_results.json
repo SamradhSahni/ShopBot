@@ -1,0 +1,212 @@
+{
+  "timestamp": "2026-09-02 21:36:55",
+  "model": "codellama",
+  "total_questions": 5,
+  "comparisons": [
+    {
+      "question": "What is the warranty on the Dell XPS 15 laptop?",
+      "without_rag": {
+        "response": "The Dell XPS 15 laptop has a one-year limited warranty on the laptop itself, which covers defects in materials and workmanship. Additionally, Dell offers a one-year extended warranty on the laptop's battery and hard drive. The warranty information can be found on the Dell website or by contacting Dell customer support.",
+        "latency_ms": 7572,
+        "tokens_used": 80
+      },
+      "with_rag": {
+        "response": "The Dell XPS 15 laptop has a 2-year manufacturer warranty with on-site support.",
+        "latency_ms": 7402,
+        "retrieve_latency_ms": 2384,
+        "llm_latency_ms": 5017,
+        "tokens_used": 27,
+        "sources": [
+          "products.json",
+          "products.json",
+          "products.json"
+        ],
+        "top_similarity": 0.79,
+        "retrieved_chunks": [
+          {
+            "source": "products.json",
+            "type": "product",
+            "similarity": 0.79,
+            "preview": "Product: Dell XPS 15 Laptop. Category: Laptops. Price: $1499.99 USD. SKU: DELL-XPS15-13700H. Specifications: Intel Core i7-13700H, 16GB DDR5 RAM, 512GB NVMe SSD, NVIDIA RTX 4060 8G..."
+          },
+          {
+            "source": "products.json",
+            "type": "product",
+            "similarity": 0.692,
+            "preview": "Product: Dell G16 7630 - 16GB/1TB. Category: Laptops. Price: $1437.29 USD. SKU: DELL-G16-7630-16GB-1TB. Specifications: Intel Core i7-class processor, 16GB DDR5 and 1TB PCIe NVMe S..."
+          },
+          {
+            "source": "products.json",
+            "type": "product",
+            "similarity": 0.69,
+            "preview": "Product: Dell Latitude 5450 - 16GB/512GB. Category: Laptops. Price: $893.17 USD. SKU: DELL-LATITUDE-5450-16GB-512GB. Specifications: Intel Core Ultra-class processor, 16GB DDR5 mem..."
+          }
+        ]
+      }
+    },
+    {
+      "question": "How much does express shipping cost?",
+      "without_rag": {
+        "response": "Express shipping is available for orders over $50. The cost of express shipping is $10.99 for domestic orders and $15.99 for international orders. Please note that these prices are subject to change and may vary depending on the shipping carrier and location. Additionally, if you have any questions about express shipping or would like to know more about our shipping options, please don't hesitate to ask.",
+        "latency_ms": 8388,
+        "tokens_used": 94
+      },
+      "with_rag": {
+        "response": "Express shipping costs $9.99 USD.",
+        "latency_ms": 5574,
+        "retrieve_latency_ms": 2090,
+        "llm_latency_ms": 3483,
+        "tokens_used": 13,
+        "sources": [
+          "shipping_zones.json",
+          "shipping_zones.json",
+          "shipping_zones.json"
+        ],
+        "top_similarity": 0.783,
+        "retrieved_chunks": [
+          {
+            "source": "shipping_zones.json",
+            "type": "shipping",
+            "similarity": 0.783,
+            "preview": "Domestic Shipping — Express Shipping: Delivery in 2-3 business days. Cost: $9.99 USD.  P.O. Box allowed: No. Cut-off time: 2:00 PM EST. Physical address required. Not available for..."
+          },
+          {
+            "source": "shipping_zones.json",
+            "type": "shipping",
+            "similarity": 0.737,
+            "preview": "International Shipping — Rest of World: Delivery in 14-21 business days. Cost: $39.99 USD. Carrier: DHL Express. Note: Customer responsible for all import duties and taxes...."
+          },
+          {
+            "source": "shipping_zones.json",
+            "type": "shipping",
+            "similarity": 0.732,
+            "preview": "International Shipping — Asia Pacific: Delivery in 10-18 business days. Cost: $34.99 USD. Carrier: FedEx International. Note: Customer responsible for all import duties and taxes...."
+          }
+        ]
+      }
+    },
+    {
+      "question": "Can I return an opened laptop within 30 days?",
+      "without_rag": {
+        "response": "Yes, you can return an opened laptop within 30 days of purchase. Please note that the return process may vary depending on the specific product and the retailer's return policy. It is best to check with the retailer's return policy and follow their instructions for returning an opened laptop within 30 days. Additionally, it is important to ensure that the laptop is in its original condition and packaged in its original packaging to facilitate a smooth return process.",
+        "latency_ms": 8926,
+        "tokens_used": 101
+      },
+      "with_rag": {
+        "response": "Yes, you can return an opened laptop within 30 days of delivery. However, it's important to note that opened software and digital codes are not returnable. If the laptop is damaged or defective, you can contact our customer service team within 7 days of delivery to arrange a free return and receive a full refund or replacement at no extra cost. Photos of damage may be required for processing.\n\nIt's also important to check the return and refund policy to ensure that you are eligible for a return and to understand the process for initiating a return. You can find the return and refund policy on our website or by contacting our customer service team.\n\nIf you have any further questions or concerns, please don't hesitate to ask. We're here to help and want to make sure you have a positive shopping experience with us.",
+        "latency_ms": 17621,
+        "retrieve_latency_ms": 2071,
+        "llm_latency_ms": 15549,
+        "tokens_used": 187,
+        "sources": [
+          "faqs.md",
+          "policies.md",
+          "policies.md"
+        ],
+        "top_similarity": 0.804,
+        "retrieved_chunks": [
+          {
+            "source": "faqs.md",
+            "type": "faq",
+            "similarity": 0.804,
+            "preview": "Question: Can I return an opened product? Answer: Yes, as long as it's within 30 days and the product is in resalable condition with all original accessories. Opened software and d..."
+          },
+          {
+            "source": "policies.md",
+            "type": "policy",
+            "similarity": 0.741,
+            "preview": "## Return & Refund Policy  ### Standard Return Window - Customers may return eligible items within **30 days** of the delivery date. - Items must be in their **original, unused con..."
+          },
+          {
+            "source": "policies.md",
+            "type": "policy",
+            "similarity": 0.676,
+            "preview": "order systems cannot be returned unless defective.  ### Defective or Damaged Items - If an item arrives damaged or defective, contact us within **7 days** of delivery. - We will ar..."
+          }
+        ]
+      }
+    },
+    {
+      "question": "What is the price of the Sony WH-1000XM5 headphones?",
+      "without_rag": {
+        "response": "The price of the Sony WH-1000XM5 headphones is $349.99 USD.",
+        "latency_ms": 5004,
+        "tokens_used": 29
+      },
+      "with_rag": {
+        "response": "The price of the Sony WH-1000XM5 headphones is $349.99 USD.",
+        "latency_ms": 6892,
+        "retrieve_latency_ms": 2078,
+        "llm_latency_ms": 4813,
+        "tokens_used": 29,
+        "sources": [
+          "products.json",
+          "products.json",
+          "products.json"
+        ],
+        "top_similarity": 0.828,
+        "retrieved_chunks": [
+          {
+            "source": "products.json",
+            "type": "product",
+            "similarity": 0.828,
+            "preview": "Product: Sony WH-1000XM5 Headphones. Category: Audio. Price: $349.99 USD. SKU: SONY-WH1000XM5. Specifications: Industry-leading noise cancelling, 30hr battery, Bluetooth 5.2, LDAC,..."
+          },
+          {
+            "source": "products.json",
+            "type": "product",
+            "similarity": 0.782,
+            "preview": "Product: Sony WF-1000XM5 - Black. Category: Audio. Price: $279.63 USD. SKU: SONY-WF-1000XM5-BLACK. Specifications: True wireless earbuds with active noise cancellation, Bluetooth m..."
+          },
+          {
+            "source": "products.json",
+            "type": "product",
+            "similarity": 0.768,
+            "preview": "Product: Sony WF-1000XM5 - White. Category: Audio. Price: $291.47 USD. SKU: SONY-WF-1000XM5-WHITE. Specifications: True wireless ANC earbuds with Bluetooth multipoint, high-resolut..."
+          }
+        ]
+      }
+    },
+    {
+      "question": "Do you offer free shipping? What is the minimum order?",
+      "without_rag": {
+        "response": "Yes, we offer free shipping on all orders over $50. The minimum order is $50. If you have any questions about our shipping policies or would like to know more about our shipping options, please let me know.",
+        "latency_ms": 5778,
+        "tokens_used": 51
+      },
+      "with_rag": {
+        "response": "Yes, we offer free shipping on all orders over $50 within the United States. The minimum order value is $50, but orders under $50 incur a $4.99 standard shipping fee. If you have any further questions or concerns about shipping, please don't hesitate to contact our customer support team.",
+        "latency_ms": 9935,
+        "retrieve_latency_ms": 2122,
+        "llm_latency_ms": 7812,
+        "tokens_used": 73,
+        "sources": [
+          "faqs.md",
+          "faqs.md",
+          "shipping_zones.json"
+        ],
+        "top_similarity": 0.79,
+        "retrieved_chunks": [
+          {
+            "source": "faqs.md",
+            "type": "faq",
+            "similarity": 0.79,
+            "preview": "Question: Do you offer free shipping? Answer: Yes! Standard shipping is free on all orders over $50 within the United States...."
+          },
+          {
+            "source": "faqs.md",
+            "type": "faq",
+            "similarity": 0.761,
+            "preview": "Question: Is there a minimum order value? Answer: No minimum order value. However, orders under $50 incur a $4.99 standard shipping fee...."
+          },
+          {
+            "source": "shipping_zones.json",
+            "type": "shipping",
+            "similarity": 0.734,
+            "preview": "Domestic Shipping — Standard Shipping: Delivery in 5-7 business days. Cost: $4.99 USD. Free on orders over $50.0. P.O. Box allowed: Yes. Cut-off time: 2:00 PM EST. Free on orders o..."
+          }
+        ]
+      }
+    }
+  ]
+}

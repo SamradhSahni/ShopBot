@@ -1,0 +1,106 @@
+services:
+
+  # ── Ollama LLM Runtime (Using Host Instance) ───────────────────────────────
+  # The services below will connect to your local Ollama on port 11434
+  # using host.docker.internal
+
+  # ── Data Service (:8003) ───────────────────────────────────────────────────
+  data-service:
+    build:
+      context: ./ex4_services/data_service
+      dockerfile: Dockerfile
+    container_name: shopbot-data
+    ports:
+      - "8013:8003"
+    volumes:
+      - ./knowledge_base:/app/knowledge_base:ro
+    environment:
+      - KB_DIR=/app/knowledge_base
+    networks:
+      - shopbot-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  # ── RAG Service (:8001) ────────────────────────────────────────────────────
+  rag-service:
+    build:
+      context: ./ex4_services/rag_service
+      dockerfile: Dockerfile
+    container_name: shopbot-rag
+    ports:
+      - "8011:8001"
+    volumes:
+      - chroma_data:/app/chroma_db
+    environment:
+      - OLLAMA_URL=http://host.docker.internal:11434
+      - CHROMA_PATH=/app/chroma_db
+    networks:
+      - shopbot-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  # ── LLM Service (:8002) ────────────────────────────────────────────────────
+  llm-service:
+    build:
+      context: ./ex4_services/llm_service
+      dockerfile: Dockerfile
+    container_name: shopbot-llm
+    ports:
+      - "8012:8002"
+    environment:
+      - OLLAMA_URL=http://host.docker.internal:11434
+    networks:
+      - shopbot-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  # ── App Service / Orchestrator (:8000) ────────────────────────────────────
+  app-service:
+    build:
+      context: ./ex4_services/app_service
+      dockerfile: Dockerfile
+    container_name: shopbot-app
+    ports:
+      - "8080:8000"
+    environment:
+      - RAG_SERVICE_URL=http://rag-service:8001
+      - LLM_SERVICE_URL=http://llm-service:8002
+      - DATA_SERVICE_URL=http://data-service:8003
+    depends_on:
+      rag-service:
+        condition: service_healthy
+      llm-service:
+        condition: service_healthy
+      data-service:
+        condition: service_healthy
+    networks:
+      - shopbot-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+# ── Networks ───────────────────────────────────────────────────────────────────
+networks:
+  shopbot-net:
+    driver: bridge
+    name: shopbot-network
+
+# ── Volumes ────────────────────────────────────────────────────────────────────
+volumes:
+  chroma_data:
+    name: shopbot-chroma-data

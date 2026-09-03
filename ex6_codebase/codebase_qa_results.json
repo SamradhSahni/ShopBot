@@ -1,0 +1,141 @@
+[
+  {
+    "question": "Which files are involved in processing a user chat request end-to-end?",
+    "answer": "The end-to-end processing of a user chat request involves the following files:\n\n1. `ex4_services/app_service/main.py`: This file contains the `ChatRequest` class, which is used to process the user's chat request.\n2. `ex3_rag/app.py`: This file contains the `ChatRequest` class, which is used to process the user's chat request.\n3. `ex1_basic/app.py`: This file contains the `ChatRequest` class, which is used to process the user's chat request.\n4. `ex4_services/data_service/main.py`: This file contains the `get_faqs` function, which is used to retrieve the FAQs from the knowledge base.\n5. `ex4_services/data_service/main.py`: This file contains the `load_faqs` function, which is used to load the FAQs from the knowledge base.\n\nThe `ChatRequest` class is used to process the user's chat request and retrieve the appropriate response from the knowledge base. The `get_faqs` function is used to retrieve the FAQs from the knowledge base, and the `load_faqs` function is used to load the FAQs from the knowledge base.",
+    "relevant_files": [
+      "ex4_services/data_service/main.py",
+      "ex3_rag/app.py",
+      "ex4_services/app_service/main.py",
+      "ex1_basic/app.py"
+    ],
+    "relevant_functions": [
+      "ChatRequest",
+      "ChatRequest",
+      "ChatRequest",
+      "get_faqs",
+      "load_faqs"
+    ],
+    "chunks_used": 5
+  },
+  {
+    "question": "Which service or module handles vector similarity search and retrieval?",
+    "answer": "The service or module that handles vector similarity search and retrieval is the \"retriever\" module in the \"ex3_rag\" directory. The \"retriever\" module is responsible for generating embeddings for queries and retrieving relevant chunks from the ChromaDB.\n\nThe \"retriever\" module is imported in the \"main.py\" file in the \"ex4_services/rag_service\" directory, where it is used to perform vector similarity search and retrieval. The \"main.py\" file also imports the \"chromadb\" module, which is used to interact with the ChromaDB.\n\nTherefore, the \"retriever\" module is the primary service or module that handles vector similarity search and retrieval in the ShopBot RAG codebase.",
+    "relevant_files": [
+      "ex4_services/rag_service/main.py",
+      "ex3_rag/retriever.py",
+      "ex2_knowledge_base/embedder.py",
+      "ex4_services/data_service/main.py",
+      "ex3_rag/app.py"
+    ],
+    "relevant_functions": [
+      "module:retriever",
+      "module:main",
+      "RetrievedChunk",
+      "search_products",
+      "module:embedder"
+    ],
+    "chunks_used": 5
+  },
+  {
+    "question": "What happens after the user submits a message in the chat UI?",
+    "answer": "After the user submits a message in the chat UI, the `chat` endpoint is called in the `app.py` file. This endpoint is defined as a POST request and takes a `ChatRequest` object as input. The `ChatRequest` object contains the user's message and other parameters, such as the model to use and the top-k value.\n\nThe `chat` endpoint then calls the `generate_response` function, which is defined in the `ex4_services/app_service/main.py` file. This function sends the user's message to the Code Llama model via Ollama and returns the response.\n\nThe `generate_response` function also takes other parameters, such as the system prompt and the temperature, which are used to generate the response.\n\nOnce the `generate_response` function returns the response, the `chat` endpoint returns a `ChatResponse` object, which contains the response, the model used, the latency, the number of tokens used, the number of prompt tokens, and an error flag.\n\nThe `chat` endpoint is then called again in the `app.py` file, and the process is repeated for each subsequent message submitted by the user.",
+    "relevant_files": [
+      "ex3_rag/app.py",
+      "ex4_services/app_service/main.py",
+      "ex1_basic/app.py"
+    ],
+    "relevant_functions": [
+      "ChatRequest",
+      "ChatRequest",
+      "ChatRequest",
+      "ChatResponse",
+      "HealthResponse"
+    ],
+    "chunks_used": 5
+  },
+  {
+    "question": "Which components would break or be affected if ChromaDB becomes unavailable?",
+    "answer": "If ChromaDB becomes unavailable, the following components would break or be affected:\n\n1. The RAG Service, which relies on ChromaDB for embedding and vector retrieval. The `get_collection()` function in the `main.py` file would fail, causing the service to return an error.\n2. The Data Service, which relies on ChromaDB for storing and retrieving policies. The `load_policies()` function in the `main.py` file would fail, causing the service to return an error.\n3. The Embedder Proxy, which relies on ChromaDB for storing and retrieving embeddings. The `get_kb_stats()` function in the `embedder_proxy.py` file would fail, causing the proxy to return an error.\n\nThese components would need to be updated or replaced if ChromaDB becomes unavailable, as they rely on it for storing and retrieving data.",
+    "relevant_files": [
+      "ex4_services/rag_service/main.py",
+      "ex4_services/data_service/main.py",
+      "ex3_rag/embedder_proxy.py",
+      "ex2_knowledge_base/embedder.py"
+    ],
+    "relevant_functions": [
+      "module:main",
+      "get_chroma_collection",
+      "health",
+      "load_policies",
+      "get_kb_stats"
+    ],
+    "chunks_used": 5
+  },
+  {
+    "question": "Which files would need to change to add a new LLM model to ShopBot?",
+    "answer": "To add a new LLM model to ShopBot, you would need to make changes to the following files:\n\n1. `ex4_services/llm_service/main.py`: This file contains the `list_models` function that retrieves the list of available LLM models from Ollama. You would need to add the new model to this list by modifying the `models` variable.\n2. `ex1_basic/ollama_client.py`: This file contains the `generate_response` function that sends a request to Ollama to generate a response for a given prompt. You would need to add the new model to the `models` variable in this function.\n3. `ex1_basic/app.py`: This file contains the `list_available_models` function that retrieves the list of available LLM models from Ollama. You would need to add the new model to this list by modifying the `models` variable.\n\nAdditionally, you would need to modify the `OLLAMA_URL` variable in the `ex4_services/llm_service/main.py` file to point to the new Ollama instance that supports the new LLM model.\n\nIt's important to note that you would also need to modify the `SYSTEM_PROMPT` variable in the `ex1_basic/app.py` file to include the new model in the prompt.",
+    "relevant_files": [
+      "ex4_services/llm_service/main.py",
+      "ex1_basic/ollama_client.py",
+      "ex1_basic/app.py"
+    ],
+    "relevant_functions": [
+      "module:main",
+      "module:ollama_client",
+      "list_models",
+      "module:app",
+      "health"
+    ],
+    "chunks_used": 5
+  },
+  {
+    "question": "How does the RAG service communicate with the LLM service?",
+    "answer": "The RAG service communicates with the LLM service through the `llm_service` module in the `ex4_services` directory. The `llm_service` module contains the `list_models` function, which retrieves a list of models supported by the LLM service. The `list_models` function makes a GET request to the `/api/tags` endpoint of the LLM service to retrieve a list of models.\n\nThe RAG service also communicates with the LLM service through the `generate` endpoint of the `llm_service` module. The `generate` endpoint takes a `GenerateRequest` object as input, which contains the text to be generated and the model to be used. The `generate` endpoint makes a POST request to the `/generate` endpoint of the LLM service to generate the text.\n\nThe RAG service also communicates with the LLM service through the `retrieve` endpoint of the `llm_service` module. The `retrieve` endpoint takes a `RetrieveRequest` object as input, which contains the text to be retrieved and the model to be used. The `retrieve` endpoint makes a POST request to the `/retrieve` endpoint of the LLM service to retrieve the text.\n\nIn summary, the RAG service communicates with the LLM service through the `llm_service` module, which provides a set of endpoints for generating and retrieving text using the LLM service.",
+    "relevant_files": [
+      "ex4_services/rag_service/main.py",
+      "ex4_services/llm_service/main.py",
+      "ex4_services/app_service/main.py"
+    ],
+    "relevant_functions": [
+      "health",
+      "module:main",
+      "module:main",
+      "list_models",
+      "health"
+    ],
+    "chunks_used": 5
+  },
+  {
+    "question": "Which function is responsible for embedding user queries into vectors?",
+    "answer": "The function responsible for embedding user queries into vectors is `get_embedding` in the `embedder.py` file. This function uses the Ollama API to generate a vector embedding for the given text using the `nomic-embed-text` model. The generated embedding is then returned as a list of floats.\n\nThe `get_embedding` function is called by the `query_collection` function in the same file, which takes the user's question as input and generates an embedding for it. The `query_collection` function then uses the generated embedding to query the ChromaDB database and retrieve the top-N most similar chunks.\n\nThe `query_collection` function is also responsible for handling the ChromaDB database and its configuration. It uses the `chromadb` library to interact with the database and retrieve the results of the query. The `chromadb` library is a Python wrapper for the ChromaDB database, which allows for easy interaction with the database from Python code.\n\nOverall, the codebase architecture is designed to allow for easy integration of the ShopBot RAG service with the ChromaDB database and the Ollama API for text embedding. The `embedder.py` file is responsible for generating embeddings for user queries and querying the ChromaDB database, while the `retriever.py` file is responsible for handling the vector retrieval from the ChromaDB database. The `main.py` file is the entry point for the RAG service and is responsible for handling the HTTP requests and responses.",
+    "relevant_files": [
+      "ex2_knowledge_base/embedder.py",
+      "ex4_services/rag_service/main.py",
+      "ex3_rag/retriever.py"
+    ],
+    "relevant_functions": [
+      "module:embedder",
+      "query_collection",
+      "module:retriever",
+      "get_embedding",
+      "module:main"
+    ],
+    "chunks_used": 5
+  },
+  {
+    "question": "What test or evaluation scripts exist and what do they measure?",
+    "answer": "The codebase includes several test and evaluation scripts that measure different aspects of the ShopBot AI's performance.\n\n1. `evaluator.py`: This script is used to evaluate the ShopBot AI's performance on three different language models (codellama, starcoder2, and deepseek-coder). It measures the correctness, relevance, retrieval quality, hallucination rate, latency, token usage, and memory consumption of the AI.\n2. `generate_report.py`: This script is used to generate a full analysis report of the ShopBot AI's performance. It loads the results from the `results` directory and generates a report that includes the models included, the metrics measured, and the results for each model.\n3. `rag_pipeline.py` and `retriever.py`: These scripts are used to implement the RAG pipeline and the retriever, respectively. They are not directly related to the evaluation of the ShopBot AI's performance, but they are used in the evaluation process.\n\nOverall, the codebase includes several scripts that are used to evaluate and analyze the ShopBot AI's performance on different language models.",
+    "relevant_files": [
+      "evaluation/evaluator.py",
+      "evaluation/generate_report.py"
+    ],
+    "relevant_functions": [
+      "module:evaluator",
+      "get_memory_mb",
+      "score_retrieval_quality",
+      "module:generate_report",
+      "main"
+    ],
+    "chunks_used": 5
+  }
+]

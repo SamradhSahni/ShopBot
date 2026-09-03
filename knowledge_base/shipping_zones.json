@@ -1,0 +1,80 @@
+{
+  "store_name": "TechMart",
+  "currency": "USD",
+  "domestic": {
+    "standard": {
+      "name": "Standard Shipping",
+      "estimated_days": "5-7 business days",
+      "cost_usd": 4.99,
+      "free_threshold_usd": 50.00,
+      "cutoff_time": "2:00 PM EST",
+      "po_box_allowed": true,
+      "notes": "Free on orders over $50. Same-day dispatch for orders placed before 2PM EST on business days."
+    },
+    "express": {
+      "name": "Express Shipping",
+      "estimated_days": "2-3 business days",
+      "cost_usd": 9.99,
+      "free_threshold_usd": null,
+      "cutoff_time": "2:00 PM EST",
+      "po_box_allowed": false,
+      "notes": "Physical address required. Not available for all products."
+    },
+    "overnight": {
+      "name": "Overnight Shipping",
+      "estimated_days": "1 business day",
+      "cost_usd": 24.99,
+      "free_threshold_usd": null,
+      "cutoff_time": "12:00 PM EST",
+      "po_box_allowed": false,
+      "notes": "Must order before 12PM EST. Not available on Fridays for Saturday delivery. Physical address required."
+    }
+  },
+  "international": {
+    "canada_mexico": {
+      "name": "Canada & Mexico",
+      "estimated_days": "5-10 business days",
+      "cost_usd": 14.99,
+      "customs_note": "Customer responsible for all import duties and taxes.",
+      "carrier": "FedEx International"
+    },
+    "europe": {
+      "name": "Europe (EU + UK)",
+      "estimated_days": "7-14 business days",
+      "cost_usd": 29.99,
+      "customs_note": "Customer responsible for VAT and import duties.",
+      "carrier": "DHL Express",
+      "countries": ["UK", "Germany", "France", "Italy", "Spain", "Netherlands", "Sweden", "Poland", "and 20+ more"]
+    },
+    "asia_pacific": {
+      "name": "Asia Pacific",
+      "estimated_days": "10-18 business days",
+      "cost_usd": 34.99,
+      "customs_note": "Customer responsible for all import duties and taxes.",
+      "carrier": "FedEx International",
+      "countries": ["Japan", "South Korea", "Australia", "Singapore", "India", "and more"]
+    },
+    "rest_of_world": {
+      "name": "Rest of World",
+      "estimated_days": "14-21 business days",
+      "cost_usd": 39.99,
+      "customs_note": "Customer responsible for all import duties and taxes.",
+      "carrier": "DHL Express"
+    }
+  },
+  "restrictions": {
+    "non_shippable_internationally": [
+      "Certain high-powered lasers",
+      "Products with large lithium batteries (above 100Wh) may have restrictions",
+      "Some regional broadcast electronics"
+    ],
+    "carriers_used_domestic": ["UPS", "FedEx", "USPS"],
+    "signature_required_above_usd": 500
+  },
+  "tracking": {
+    "available_for": "All orders",
+    "notification_method": "Email and SMS (if opted in)",
+    "real_time_tracking": true,
+    "tracking_url": "https://techmart.com/track"
+  }
+}
