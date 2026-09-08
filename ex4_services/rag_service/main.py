@@ -1,6 +1,7 @@
 """
 main.py — RAG Service
-Exercise 4: Handles embedding + vector retrieval from ChromaDB
+Uses sentence-transformers (all-MiniLM-L6-v2) for lightweight in-process embedding.
+No Ollama dependency for retrieval — saves significant RAM on low-resource VMs.
 Port: 8001
 """
 
@@ -8,19 +9,28 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
-import requests, os, sys
+import os
 
-app = FastAPI(title="ShopBot RAG Service", version="1.0.0")
+app = FastAPI(title="ShopBot RAG Service", version="2.0.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
-OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
 CHROMA_PATH = os.getenv("CHROMA_PATH", os.path.join(
-    os.path.dirname(__file__), "..", "..", "ex2_knowledge_base", "chroma_db"))
-EMBED_MODEL = "nomic-embed-text"
+    os.path.dirname(__file__), "..", "..", "chroma_db"))
 COLLECTION_NAME = "shopbot_kb"
-MIN_SIMILARITY = 0.3
+EMBED_MODEL = "all-MiniLM-L6-v2"
+MIN_SIMILARITY = 0.2
 
 import chromadb
+from sentence_transformers import SentenceTransformer
+
+# Load model once at startup — cached in memory
+_model = None
+
+def get_model() -> SentenceTransformer:
+    global _model
+    if _model is None:
+        _model = SentenceTransformer(EMBED_MODEL)
+    return _model
 
 
 def get_collection():
@@ -32,21 +42,7 @@ def get_collection():
 
 
 def embed(text: str) -> List[float]:
-    for endpoint, payload_key, response_key in [
-        ("/api/embed",      "input",  "embeddings"),
-        ("/api/embeddings", "prompt", "embedding"),
-    ]:
-        try:
-            r = requests.post(f"{OLLAMA_URL}{endpoint}",
-                              json={"model": EMBED_MODEL, payload_key: text}, timeout=30)
-            if r.status_code == 404:
-                continue
-            r.raise_for_status()
-            data = r.json()
-            return data[response_key][0] if response_key == "embeddings" else data[response_key]
-        except requests.exceptions.HTTPError:
-            continue
-    raise RuntimeError("Ollama embedding API unavailable")
+    return get_model().encode(text, normalize_embeddings=True).tolist()
 
 
 class RetrieveRequest(BaseModel):
@@ -87,7 +83,7 @@ def retrieve(request: RetrieveRequest):
         query_embedding = embed(request.question)
         results = collection.query(
             query_embeddings=[query_embedding],
-            n_results=request.top_k,
+            n_results=min(request.top_k, collection.count()),
             include=["documents", "metadatas", "distances"]
         )
 
@@ -107,7 +103,6 @@ def retrieve(request: RetrieveRequest):
                     similarity_score=similarity,
                 ))
 
-        # Build context string
         if chunks:
             parts = [f"[Source: {c.source} | Type: {c.type}]\n{c.text}" for c in chunks]
             context = "\n\n---\n\n".join(parts)

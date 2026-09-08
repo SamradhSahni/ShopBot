@@ -1,106 +1,179 @@
 # 🛒 ShopBot AI — E-Commerce Support Assistant
 
-**ShopBot AI** is an advanced, AI-powered customer support microservices application built for "TechMart". It utilizes a state-of-the-art **Retrieval-Augmented Generation (RAG)** pipeline to answer customer queries accurately by grounding responses in the store's actual product catalog, FAQs, and policies, drastically reducing AI hallucinations.
+**ShopBot AI** is an AI-powered customer support application for "TechMart" built with a microservices architecture. It uses a **Retrieval-Augmented Generation (RAG)** pipeline to answer customer queries accurately, grounding responses in actual product data, FAQs, and store policies.
 
-This project is built using a modern AI stack: **FastAPI, ChromaDB, Ollama (Llama 3 / Code Llama), Sentence Transformers, and Docker**.
+Optimized for **low-RAM environments** (Ubuntu VM / cloud instance with 2–4GB RAM) using:
+- **tinyllama** (1.1B LLM — ~600MB RAM via Ollama)
+- **all-MiniLM-L6-v2** (80MB sentence-transformers embedding model, runs in-container)
+- Memory-limited Docker containers
 
 ---
 
-## 🏗️ Architecture Overview
+## 🏗️ Architecture
 
-The system runs on a microservices architecture orchestrated by Docker Compose:
-
-1. **App Service (`:8080`)**: The frontend orchestrator. Serves the web-based Chat UI and handles the core pipeline logic between RAG and LLM services.
-2. **RAG Service (`:8011`)**: The semantic search engine. Embeds user queries and performs fast vector similarity searches against ChromaDB to find relevant knowledge chunks.
-3. **LLM Service (`:8012`)**: The generation engine. Communicates with your local Ollama instance to stream intelligent, conversational responses.
-4. **Data Service (`:8013`)**: The catalog backend. Provides raw REST API access to products, policies, and shipping information.
-
-```mermaid
-flowchart TD
-    User((User Browser)) <-->|HTTP :8080| AppService[App Service\n(UI + Orchestrator)]
-    
-    AppService <-->|Internal API| RAGService[RAG Service\n(Vector Search)]
-    AppService <-->|Internal API| DataService[Data Service\n(Raw JSON/MD)]
-    AppService <-->|Internal API| LLMService[LLM Service\n(Prompt Gen)]
-    
-    RAGService <--> ChromaDB[(ChromaDB)]
-    LLMService <--> Ollama[(Local Ollama Host\n:11434)]
 ```
+Browser ──► App Service :8080 (Orchestrator + Web UI)
+                  │                   │
+        RAG Service :8011     LLM Service :8012
+          (ChromaDB +           (tinyllama via
+        Sentence Transformers)   Ollama on Host)
+                                      │
+                              Ollama :11434 (Host)
+```
+
+| Service | Host Port | Container Port | RAM Limit |
+|---|---|---|---|
+| App Service | 8080 | 8000 | 256 MB |
+| RAG Service | 8011 | 8001 | 512 MB |
+| LLM Service | 8012 | 8002 | 256 MB |
+| Data Service | 8013 | 8003 | 256 MB |
 
 ---
 
 ## 📋 Prerequisites
 
-Before you begin, ensure you have the following installed on your host machine:
-
-1. **[Git](https://git-scm.com/)** - For cloning the repository.
-2. **[Docker Desktop](https://www.docker.com/products/docker-desktop/)** - Ensure the Docker Engine is running and WSL2 integration is enabled (if on Windows).
-3. **[Ollama](https://ollama.ai/)** - Must be installed and running locally on your host machine.
-
-### Model Requirements
-Once Ollama is running, open your terminal and pull the required models:
-```bash
-ollama pull llama3
-ollama pull nomic-embed-text
-```
+- **Ubuntu VM** (or any Linux machine) with at least **2GB RAM** free
+- **Docker & Docker Compose** installed
+- **Python 3.10+** for building the knowledge base
+- **Git** for cloning the repository
 
 ---
 
-## 🚀 Step-by-Step Running Guide
+## 🚀 Complete VM Setup Guide
 
-Follow these steps to clone, build, and run ShopBot AI locally.
+### Step 1 — Install Dependencies
 
-### 1. Clone the Repository
+```bash
+# Update apt
+sudo apt update && sudo apt install -y git python3 python3-pip curl
+
+# Verify Docker is working
+docker --version
+docker compose version
+```
+
+### Step 2 — Install Ollama
+
+```bash
+# Install Ollama (handles its own systemd service)
+curl -fsSL https://ollama.ai/install.sh | sh
+
+# Start Ollama as a background service
+sudo systemctl enable ollama
+sudo systemctl start ollama
+
+# Verify it is running
+curl http://localhost:11434/api/tags
+```
+
+### Step 3 — Pull the Lightweight LLM
+
+```bash
+# tinyllama = 1.1B params, ~637MB download, ~600MB RAM usage
+ollama pull tinyllama
+
+# Verify the model is available
+ollama list
+```
+
+> **Note:** To use a slightly better quality model if you have 4GB+ free RAM, use `phi3:mini` instead:
+> ```bash
+> ollama pull phi3:mini
+> # Then edit docker-compose.yml: DEFAULT_MODEL=phi3:mini
+> ```
+
+### Step 4 — Clone the Repository
+
 ```bash
 git clone https://github.com/SamradhSahni/ShopBot.git
 cd ShopBot
 ```
 
-### 2. Build the Knowledge Base (Optional but recommended)
-If you need to re-index the 500+ products into ChromaDB for the first time:
-```bash
-# Requires Python 3.10+
-pip install -r ex2_knowledge_base/requirements.txt
-python ex2_knowledge_base/build_kb.py
-```
-*(Note: A pre-built `chroma_db` folder might already be included in the repository depending on your branch).*
+### Step 5 — Build the Knowledge Base
 
-### 3. Start the Microservices
-Ensure Docker Desktop is open and the engine is running (green indicator). Then, in the root `shopbot/` directory, run:
+This step generates the ChromaDB vector database from the product catalog. Runs **once** on your VM. The `all-MiniLM-L6-v2` model (~80MB) downloads automatically.
+
 ```bash
+# Install Python dependencies for KB building
+pip install chromadb==0.5.23 sentence-transformers==2.7.0
+
+# Run the knowledge base builder (takes ~30-60 seconds)
+python3 ex2_knowledge_base/build_kb.py
+```
+
+You should see output like:
+```
+  Total chunks to embed: 63
+  Done! 63 chunks stored in ChromaDB
+  KB built successfully!
+```
+
+### Step 6 — Start the Microservices
+
+```bash
+# Build all Docker images and start containers in background
 docker compose up -d --build
+
+# Watch container startup logs (Ctrl+C to exit watching)
+docker compose logs -f
 ```
-This will build the Docker images for all 4 microservices and start them in the background. It maps them safely to host ports to avoid conflicts with your local system.
 
-### 4. Access the Application
-Once the containers report as `Started`, open your web browser and go to:
+> **First run note:** The RAG service Docker image downloads and bakes in the `all-MiniLM-L6-v2` model (~80MB) during build. This takes a few minutes but only happens once.
 
-👉 **[http://localhost:8080](http://localhost:8080)**
+### Step 7 — Verify Everything Is Running
 
-You can now chat with ShopBot! Ask questions like:
-- *"I need a durable camping tent for 4 people"*
-- *"What is the battery life of the Pro Wireless Mouse?"*
-- *"Do you have any noise-canceling headphones under $150?"*
+```bash
+# Check all containers are healthy
+docker compose ps
 
-### 5. Accessing the Backend APIs (Swagger UI)
-If you wish to test the individual microservices, each comes with an interactive OpenAPI (Swagger) interface:
-* **App Orchestrator:** [http://localhost:8080/docs](http://localhost:8080/docs)
-* **RAG Service:** [http://localhost:8011/docs](http://localhost:8011/docs)
-* **LLM Service:** [http://localhost:8012/docs](http://localhost:8012/docs)
-* **Data Service:** [http://localhost:8013/docs](http://localhost:8013/docs)
+# Check the aggregate health endpoint
+curl -s http://localhost:8080/health | python3 -m json.tool
+```
+
+Expected response:
+```json
+{
+  "status": "ok",
+  "services": {
+    "rag_service": {"status": "ok", ...},
+    "llm_service": {"status": "ok", ...},
+    "data_service": {"status": "ok", ...}
+  }
+}
+```
+
+### Step 8 — Open the Web UI
+
+Open your browser and navigate to:
+👉 **`http://<YOUR_VM_IP>:8080`**
+
+Try asking:
+- *"Do you have any waterproof tents under $100?"*
+- *"What is the return policy for opened items?"*
+- *"What headphones do you recommend for gaming?"*
 
 ---
 
-## 🛑 Stopping the Application
+## 🔧 Useful Commands
 
-To gracefully stop the containers and release the ports, run:
 ```bash
+# Stop all containers
 docker compose down
-```
 
-If you wish to completely wipe the Docker volumes (like the persistent ChromaDB storage), you can run:
-```bash
-docker compose down -v
+# Restart a single container
+docker compose restart rag-service
+
+# View logs for a specific service
+docker compose logs -f llm-service
+
+# Rebuild after code changes
+docker compose up -d --build
+
+# Check memory usage of containers
+docker stats --no-stream
+
+# Rebuild the knowledge base (if products.json changes)
+python3 ex2_knowledge_base/build_kb.py
 ```
 
 ---
@@ -108,16 +181,50 @@ docker compose down -v
 ## 📂 Project Structure
 
 ```text
-shopbot/
-├── knowledge_base/          # Shared knowledge documents (Products, FAQs, Policies)
-├── chroma_db/               # Persistent Vector Database storage
-├── ex2_knowledge_base/      # Scripts for Chunking + Embeddings + ChromaDB indexing
-├── ex3_rag/                 # Retrieval + RAG Pipeline standalone tests
-├── ex4_services/            # Microservices Architecture source code
-│   ├── app_service/         # Frontend Web UI & Orchestrator
-│   ├── data_service/        # Static knowledge API
-│   ├── llm_service/         # LLM Generation wrapper
-│   └── rag_service/         # Semantic Search wrapper
-├── docker-compose.yml       # Docker orchestration configuration
-└── README.md                # Project documentation (You are here!)
+ShopBot/
+├── knowledge_base/            # Source documents (products, FAQs, policies)
+│   ├── products.json          # 18 products across 8 categories
+│   ├── faqs.md                # 25 frequently asked questions
+│   ├── policies.md            # Return, warranty, and shipping policies
+│   └── shipping_zones.json    # Shipping zones and rates
+│
+├── chroma_db/                 # Generated ChromaDB vector store (NOT in git)
+│                              # → created by running build_kb.py
+│
+├── ex2_knowledge_base/        # KB builder scripts
+│   ├── build_kb.py            # Run this to (re)build the vector database
+│   ├── chunker.py             # Document chunking strategies
+│   └── embedder.py            # Sentence-transformers embedding + ChromaDB storage
+│
+├── ex4_services/              # Microservice source code
+│   ├── app_service/           # Web UI + Orchestrator (Port 8080)
+│   ├── rag_service/           # Semantic Search (Port 8011)
+│   ├── llm_service/           # LLM Generation (Port 8012)
+│   └── data_service/          # Raw Data API (Port 8013)
+│
+├── docker-compose.yml         # Orchestrates all 4 containers
+├── setup.sh                   # One-shot VM bootstrap script
+└── README.md                  # You are here
 ```
+
+---
+
+## 🤖 Models Used
+
+| Purpose | Model | Size | RAM Usage |
+|---|---|---|---|
+| LLM Generation | `tinyllama` (via Ollama) | ~637 MB | ~600 MB |
+| Embeddings (RAG) | `all-MiniLM-L6-v2` (sentence-transformers) | ~80 MB | ~150 MB |
+
+---
+
+## ⚙️ Configuration
+
+Environment variables can be changed in `docker-compose.yml`:
+
+| Variable | Service | Default | Description |
+|---|---|---|---|
+| `DEFAULT_MODEL` | llm-service | `tinyllama` | Ollama model to use for generation |
+| `OLLAMA_URL` | llm-service | `http://host.docker.internal:11434` | Ollama host URL |
+| `CHROMA_PATH` | rag-service | `/app/chroma_db` | Path to ChromaDB vector store |
+| `KB_DIR` | data-service | `/app/knowledge_base` | Path to knowledge base files |

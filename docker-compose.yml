@@ -1,10 +1,6 @@
 services:
 
-  # ── Ollama LLM Runtime (Using Host Instance) ───────────────────────────────
-  # The services below will connect to your local Ollama on port 11434
-  # using host.docker.internal
-
-  # ── Data Service (:8003) ───────────────────────────────────────────────────
+  # -- Data Service (:8003) ---------------------------------------------------
   data-service:
     build:
       context: ./ex4_services/data_service
@@ -24,8 +20,12 @@ services:
       timeout: 5s
       retries: 3
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
 
-  # ── RAG Service (:8001) ────────────────────────────────────────────────────
+  # -- RAG Service (:8001) ----------------------------------------------------
   rag-service:
     build:
       context: ./ex4_services/rag_service
@@ -34,20 +34,25 @@ services:
     ports:
       - "8011:8001"
     volumes:
-      - chroma_data:/app/chroma_db
+      # Mount the shared chroma_db built by build_kb.py
+      - ./chroma_db:/app/chroma_db:ro
     environment:
-      - OLLAMA_URL=http://host.docker.internal:11434
       - CHROMA_PATH=/app/chroma_db
     networks:
       - shopbot-net
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
-      interval: 15s
-      timeout: 5s
+      interval: 20s
+      timeout: 10s
       retries: 3
+      start_period: 30s
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
 
-  # ── LLM Service (:8002) ────────────────────────────────────────────────────
+  # -- LLM Service (:8002) ----------------------------------------------------
   llm-service:
     build:
       context: ./ex4_services/llm_service
@@ -56,7 +61,10 @@ services:
     ports:
       - "8012:8002"
     environment:
+      # Connects to the host machine's Ollama instance
       - OLLAMA_URL=http://host.docker.internal:11434
+      # tinyllama = 1.1B params, ~600MB RAM — change to phi3:mini for better quality
+      - DEFAULT_MODEL=tinyllama
     networks:
       - shopbot-net
     healthcheck:
@@ -65,8 +73,12 @@ services:
       timeout: 5s
       retries: 3
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
 
-  # ── App Service / Orchestrator (:8000) ────────────────────────────────────
+  # -- App Service / Orchestrator (:8000) -------------------------------------
   app-service:
     build:
       context: ./ex4_services/app_service
@@ -93,14 +105,18 @@ services:
       timeout: 5s
       retries: 3
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
 
-# ── Networks ───────────────────────────────────────────────────────────────────
+# -- Networks -----------------------------------------------------------------
 networks:
   shopbot-net:
     driver: bridge
     name: shopbot-network
 
-# ── Volumes ────────────────────────────────────────────────────────────────────
+# -- Volumes ------------------------------------------------------------------
 volumes:
   chroma_data:
     name: shopbot-chroma-data

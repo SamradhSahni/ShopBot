@@ -23,7 +23,7 @@ TIMEOUT = httpx.Timeout(120.0)
 
 class ChatRequest(BaseModel):
     message: str
-    model: Optional[str] = "codellama"
+    model: Optional[str] = "tinyllama"
     top_k: Optional[int] = 3
     use_rag: Optional[bool] = True
 

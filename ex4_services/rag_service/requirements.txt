@@ -1,6 +1,6 @@
-﻿fastapi
+fastapi
 uvicorn[standard]
-requests
 pydantic
-httpx
-chromadb
+chromadb==0.5.23
+sentence-transformers==2.7.0
+torch==2.3.1+cpu --extra-index-url https://download.pytorch.org/whl/cpu

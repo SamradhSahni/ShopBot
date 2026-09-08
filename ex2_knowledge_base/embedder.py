@@ -1,59 +1,33 @@
 """
 embedder.py — Embedding generation and ChromaDB storage for ShopBot
-Exercise 2: Convert chunks → embeddings → vector store
+Uses sentence-transformers (all-MiniLM-L6-v2) — lightweight, no Ollama needed.
+80MB model, runs on CPU, ideal for low-RAM VMs.
 """
 
-import sys, io
-if hasattr(sys.stdout, 'buffer') and sys.stdout.encoding != 'utf-8':
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
-
-import requests
 import chromadb
-from chromadb.config import Settings
 from typing import List, Dict
-import time
+from sentence_transformers import SentenceTransformer
 
-
-OLLAMA_BASE_URL = "http://localhost:11434"
-EMBED_MODEL = "nomic-embed-text"
+EMBED_MODEL = "all-MiniLM-L6-v2"
 CHROMA_PATH = "./chroma_db"
 COLLECTION_NAME = "shopbot_kb"
 
+# Singleton model instance
+_model = None
+
+
+def get_model() -> SentenceTransformer:
+    global _model
+    if _model is None:
+        print(f"  Loading embedding model '{EMBED_MODEL}'...")
+        _model = SentenceTransformer(EMBED_MODEL)
+        print(f"  Model loaded.")
+    return _model
+
 
 def get_embedding(text: str) -> List[float]:
-    """
-    Generate a vector embedding for the given text using Ollama's
-    nomic-embed-text model.
-
-    Args:
-        text: The text to embed
-    Returns:
-        A list of floats representing the embedding vector
-    """
-    # Try new Ollama API first (/api/embed, Ollama >= 0.1.26)
-    # Fall back to old API (/api/embeddings) if 404
-    for endpoint, payload_key, response_key in [
-        ("/api/embed",       "input",  "embeddings"),
-        ("/api/embeddings",  "prompt", "embedding"),
-    ]:
-        try:
-            response = requests.post(
-                f"{OLLAMA_BASE_URL}{endpoint}",
-                json={"model": EMBED_MODEL, payload_key: text},
-                timeout=30,
-            )
-            if response.status_code == 404:
-                continue
-            response.raise_for_status()
-            data = response.json()
-            # /api/embed returns {"embeddings": [[...]]}, /api/embeddings returns {"embedding": [...]}
-            if response_key == "embeddings":
-                return data[response_key][0]
-            return data[response_key]
-        except requests.exceptions.HTTPError:
-            continue
-    raise RuntimeError(f"Ollama embedding API not available at {OLLAMA_BASE_URL}. "
-                       f"Is Ollama running? Is nomic-embed-text pulled?")
+    """Generate a vector embedding using sentence-transformers."""
+    return get_model().encode(text, normalize_embeddings=True).tolist()
 
 
 def get_chroma_collection(persist_path: str = CHROMA_PATH):
@@ -61,21 +35,13 @@ def get_chroma_collection(persist_path: str = CHROMA_PATH):
     client = chromadb.PersistentClient(path=persist_path)
     collection = client.get_or_create_collection(
         name=COLLECTION_NAME,
-        metadata={"hnsw:space": "cosine"},  # Use cosine similarity
+        metadata={"hnsw:space": "cosine"},
     )
     return client, collection
 
 
 def store_chunks(chunks: List[Dict], persist_path: str = CHROMA_PATH) -> int:
-    """
-    Embed all chunks and store them in ChromaDB.
-
-    Args:
-        chunks: List of dicts with keys: id, text, metadata
-        persist_path: Where to persist the ChromaDB database
-    Returns:
-        Number of chunks stored
-    """
+    """Embed all chunks and store them in ChromaDB."""
     client, collection = get_chroma_collection(persist_path)
 
     # Check existing IDs to avoid duplicates
@@ -84,65 +50,58 @@ def store_chunks(chunks: List[Dict], persist_path: str = CHROMA_PATH) -> int:
     ids, embeddings, documents, metadatas = [], [], [], []
     skipped = 0
 
-    print(f"\n🔢 Generating embeddings using '{EMBED_MODEL}'...")
+    print(f"\n  Generating embeddings for {len(chunks)} chunks using '{EMBED_MODEL}'...")
 
-    for i, chunk in enumerate(chunks):
+    texts = []
+    new_chunks = []
+    for chunk in chunks:
         if chunk["id"] in existing:
             skipped += 1
-            continue
+        else:
+            new_chunks.append(chunk)
+            texts.append(chunk["text"])
 
-        print(f"  [{i+1}/{len(chunks)}] Embedding: {chunk['id'][:60]}...", end="\r")
+    if texts:
+        # Batch encode all texts at once — much faster than one-by-one
+        all_embeddings = get_model().encode(texts, normalize_embeddings=True, show_progress_bar=True)
 
-        embedding = get_embedding(chunk["text"])
+        for chunk, emb in zip(new_chunks, all_embeddings):
+            ids.append(chunk["id"])
+            embeddings.append(emb.tolist())
+            documents.append(chunk["text"])
+            metadatas.append(chunk["metadata"])
 
-        ids.append(chunk["id"])
-        embeddings.append(embedding)
-        documents.append(chunk["text"])
-        metadatas.append(chunk["metadata"])
+            # Batch insert every 50 chunks
+            if len(ids) >= 50:
+                collection.add(ids=ids, embeddings=embeddings,
+                               documents=documents, metadatas=metadatas)
+                ids, embeddings, documents, metadatas = [], [], [], []
 
-        # Batch insert every 10 chunks
-        if len(ids) >= 10:
-            collection.add(ids=ids, embeddings=embeddings, documents=documents, metadatas=metadatas)
-            ids, embeddings, documents, metadatas = [], [], [], []
-            time.sleep(0.1)  # small pause to avoid overwhelming Ollama
-
-    # Insert remaining
-    if ids:
-        collection.add(ids=ids, embeddings=embeddings, documents=documents, metadatas=metadatas)
+        if ids:
+            collection.add(ids=ids, embeddings=embeddings,
+                           documents=documents, metadatas=metadatas)
 
     total = collection.count()
-    print(f"\n✅ Done! {total} chunks stored in ChromaDB ({skipped} skipped as duplicates)")
+    print(f"\n  Done! {total} chunks stored ({skipped} skipped as duplicates)")
     return total
 
 
 def query_collection(query_text: str, n_results: int = 3, persist_path: str = CHROMA_PATH) -> Dict:
-    """
-    Embed a query and retrieve the top-N most similar chunks.
-
-    Args:
-        query_text: The user's question
-        n_results: Number of results to retrieve
-        persist_path: Path to ChromaDB database
-    Returns:
-        ChromaDB query result dict
-    """
+    """Embed a query and retrieve the top-N most similar chunks."""
     _, collection = get_chroma_collection(persist_path)
     query_embedding = get_embedding(query_text)
-
-    results = collection.query(
+    return collection.query(
         query_embeddings=[query_embedding],
         n_results=n_results,
         include=["documents", "metadatas", "distances"],
     )
-    return results
 
 
 def get_collection_stats(persist_path: str = CHROMA_PATH) -> Dict:
     """Return stats about the knowledge base."""
     _, collection = get_chroma_collection(persist_path)
-    count = collection.count()
     return {
-        "total_chunks": count,
+        "total_chunks": collection.count(),
         "collection_name": COLLECTION_NAME,
         "embed_model": EMBED_MODEL,
         "persist_path": persist_path,
