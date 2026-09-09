@@ -449,9 +449,9 @@
     <div class="model-selector">
       <span class="model-label">Model:</span>
       <select id="modelSelect">
-        <option value="codellama">Code Llama</option>
-        <option value="starcoder2">StarCoder2</option>
-        <option value="deepseek-coder">DeepSeek-Coder</option>
+        <option value="tinyllama" selected>TinyLlama (1.1B — Fast)</option>
+        <option value="phi3:mini">Phi-3 Mini (3.8B)</option>
+        <option value="qwen2:0.5b">Qwen2 (0.5B)</option>
       </select>
     </div>
     <div class="status-badge">
@@ -498,19 +498,19 @@
     </div>
 
     <div class="sidebar-section">
-      <h3>Exercise Info</h3>
+      <h3>System Status</h3>
       <div class="stats-card">
         <div class="stat-row">
-          <span class="stat-label">Stage</span>
-          <span class="stat-value">W3 — Ex 1</span>
+          <span class="stat-label">Architecture</span>
+          <span class="stat-value">Microservices</span>
         </div>
         <div class="stat-row">
           <span class="stat-label">Pipeline</span>
-          <span class="stat-value" style="font-size:10px;">User→API→Ollama→LLM</span>
+          <span class="stat-value" style="font-size:10px;">User→RAG→Ollama→LLM</span>
         </div>
         <div class="stat-row">
-          <span class="stat-label">RAG</span>
-          <span class="stat-value" style="color:var(--warning);">Off</span>
+          <span class="stat-label">RAG Engine</span>
+          <span class="stat-value" style="color:#10b981;">Active (ChromaDB)</span>
         </div>
       </div>
     </div>
@@ -562,7 +562,8 @@
       const data = await res.json();
       const dot = document.getElementById('statusDot');
       const txt = document.getElementById('statusText');
-      if (data.ollama_connected) {
+      const llm = data.services?.llm_service;
+      if (data.ollama_connected || llm?.ollama === 'connected' || llm?.status === 'ok') {
         dot.className = 'status-dot connected';
         txt.textContent = 'Ollama Connected';
       } else {
@@ -608,16 +609,20 @@
     const avatar = role === 'user' ? '👤' : '🤖';
     let metaHTML = '';
     if (meta) {
-      metaHTML = `<div class="meta">
+      metaHTML = `<div class="meta" style="margin-top:8px;font-size:11px;color:var(--text-muted);display:flex;gap:8px;align-items:center;">
         <span class="meta-chip">${meta.model}</span>
         <span>${meta.latency_ms}ms</span>
         <span>${meta.tokens_used} tokens</span>
       </div>`;
+      if (meta.sources && meta.sources.length > 0) {
+        const badges = meta.sources.map(s => `<span style="background:rgba(99,102,241,0.15);color:#a5b4fc;padding:2px 6px;border-radius:4px;font-size:10px;">📄 ${s.source} (${Math.round((s.similarity_score||0)*100)}%)</span>`).join(' ');
+        metaHTML += `<div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap;align-items:center;"><span style="font-size:10px;color:var(--text-muted);">Sources:</span> ${badges}</div>`;
+      }
     }
 
     div.innerHTML = `
       <div class="avatar">${avatar}</div>
-      <div class="bubble">${text.replace(/\n/g, '<br>')}${metaHTML}</div>
+      <div class="bubble">${(text || '').replace(/\n/g, '<br>')}${metaHTML}</div>
     `;
     container.appendChild(div);
     container.scrollTop = container.scrollHeight;
@@ -646,8 +651,8 @@
   // ── Update stats ───────────────────────────────────────────────────────────
   function updateStats(data) {
     sessionMessages++;
-    totalLatency += data.latency_ms;
-    totalTokens += data.tokens_used;
+    totalLatency += (data.latency_ms || 0);
+    totalTokens += (data.tokens_used || 0);
     document.getElementById('statMessages').textContent = sessionMessages;
     document.getElementById('statLatency').textContent = Math.round(totalLatency / sessionMessages) + 'ms';
     document.getElementById('statTokens').textContent = totalTokens;
@@ -675,25 +680,37 @@
       const res = await fetch('/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message, model }),
+        body: JSON.stringify({ message, model, use_rag: true }),
       });
       const data = await res.json();
 
       document.getElementById('typingIndicator')?.remove();
 
+      if (!res.ok) {
+        appendMessage('bot', '⚠️ ' + (data.detail || 'Service Error'));
+        return;
+      }
+
       if (data.error) {
-        appendMessage('bot', '⚠️ ' + data.response);
+        appendMessage('bot', '⚠️ ' + (data.response || 'An error occurred'));
       } else {
-        appendMessage('bot', data.response, {
-          model: data.model,
-          latency_ms: data.latency_ms,
-          tokens_used: data.tokens_used,
+        const latency = data.metrics ? data.metrics.total_latency_ms : (data.latency_ms || 0);
+        const tokens = data.metrics ? data.metrics.tokens_used : (data.tokens_used || 0);
+        appendMessage('bot', data.response || 'No response generated.', {
+          model: data.model || model,
+          latency_ms: latency,
+          tokens_used: tokens,
+          sources: data.retrieved_chunks || []
         });
-        updateStats(data);
+        updateStats({
+          latency_ms: latency,
+          tokens_used: tokens,
+          model: data.model || model
+        });
       }
     } catch (err) {
       document.getElementById('typingIndicator')?.remove();
-      appendMessage('bot', '❌ Failed to reach ShopBot. Please check the server is running.');
+      appendMessage('bot', '❌ Failed to reach ShopBot. Please check that the services are running.');
     } finally {
       isWaiting = false;
       document.getElementById('sendBtn').disabled = false;

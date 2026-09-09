@@ -64,7 +64,12 @@ async def health():
                 results[name] = {"status": "unreachable", "error": str(e)}
 
     all_ok = all(v.get("status") == "ok" for v in results.values())
-    return {"status": "ok" if all_ok else "degraded", "services": results}
+    ollama_ok = results.get("llm_service", {}).get("ollama") == "connected"
+    return {
+        "status": "ok" if all_ok else "degraded",
+        "ollama_connected": ollama_ok,
+        "services": results
+    }
 
 
 @app.post("/chat", response_model=ChatResponse)
