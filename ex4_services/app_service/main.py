@@ -123,7 +123,6 @@ async def chat(request: ChatRequest):
                 llm_payload["context"] = context
                 llm_payload["question"] = request.message
 
-        try:
             llm_resp = await client.post(f"{LLM_SERVICE_URL}/generate", json=llm_payload)
             llm_ms = int((time.time() - t0) * 1000)
             if llm_resp.status_code != 200:
