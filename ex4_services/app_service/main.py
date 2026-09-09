@@ -118,16 +118,22 @@ async def chat(request: ChatRequest):
                 llm_payload["context"] = context
                 llm_payload["question"] = request.message
 
+        try:
             llm_resp = await client.post(f"{LLM_SERVICE_URL}/generate", json=llm_payload)
             llm_ms = int((time.time() - t0) * 1000)
+            if llm_resp.status_code != 200:
+                raise HTTPException(status_code=503, detail=f"LLM Service HTTP {llm_resp.status_code}: {llm_resp.text}")
             llm_data = llm_resp.json()
             trace["steps"].append({
                 "step": 2, "service": "llm-service", "action": "generate",
                 "model": llm_data.get("model"), "latency_ms": llm_ms,
                 "tokens_used": llm_data.get("tokens_used", 0)
             })
+        except HTTPException:
+            raise
         except Exception as e:
-            raise HTTPException(status_code=503, detail=f"LLM Service error: {e}")
+            err_msg = str(e).strip() or repr(e)
+            raise HTTPException(status_code=503, detail=f"LLM Service error: {err_msg}")
 
     total_ms = int((time.time() - pipeline_start) * 1000)
 

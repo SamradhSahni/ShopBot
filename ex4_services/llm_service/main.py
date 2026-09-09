@@ -98,10 +98,12 @@ def generate(request: GenerateRequest):
 
     start = time.time()
     try:
+        print(f"[LLM] Calling Ollama at {OLLAMA_URL} with model '{model}'...")
         r = requests.post(f"{OLLAMA_URL}/api/generate", json=payload, timeout=180)
         r.raise_for_status()
         data = r.json()
         latency = int((time.time() - start) * 1000)
+        print(f"[LLM] Success! Generated in {latency}ms")
         return GenerateResponse(
             text=data.get("response", "").strip(),
             model=data.get("model", model),
@@ -109,11 +111,13 @@ def generate(request: GenerateRequest):
             tokens_used=data.get("eval_count", 0),
             prompt_tokens=data.get("prompt_eval_count", 0),
         )
-    except requests.exceptions.ConnectionError:
+    except requests.exceptions.ConnectionError as e:
+        print(f"[LLM] ConnectionError to Ollama at {OLLAMA_URL}: {e}")
         return GenerateResponse(text="Cannot connect to Ollama. Is it running?", model=model,
                                 latency_ms=0, tokens_used=0, prompt_tokens=0, error=True)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"[LLM] Error: {type(e).__name__}: {e}")
+        raise HTTPException(status_code=500, detail=f"{type(e).__name__}: {str(e)}")
 
 
 if __name__ == "__main__":
