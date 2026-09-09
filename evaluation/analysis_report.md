@@ -1,6 +1,6 @@
 # ShopBot AI — Model Evaluation Analysis Report
 
-> Generated: 2026-09-02 19:07  
+> Generated: 2026-09-09 21:18  
 > Application: E-Commerce Product & Policy Support Bot (TechMart)  
 > Models evaluated: codellama, starcoder2, deepseek-coder
 
@@ -136,34 +136,40 @@
 ### codellama
 
 - **Correctness:** 0.600 | **Hallucination:** 8.0% | **Latency:** 11055ms | **Memory:** 103.6MB
-- Suitable for: *[fill in after running evaluation]*
+- **Suitable for:** Production deployments where answer accuracy is the top priority and latency of ~11 seconds is acceptable. Best choice for customer support where a wrong answer is more costly than a slow one. Achieved 11 fully correct answers (vs 8 for deepseek-coder and 0 for starcoder2).
 
 ### starcoder2
 
 - **Correctness:** 0.020 | **Hallucination:** 12.0% | **Latency:** 5895ms | **Memory:** 64.4MB
-- Suitable for: *[fill in after running evaluation]*
+- **Suitable for:** NOT recommended for this use case. Despite being 2x faster than codellama and using the least tokens (31 avg), it answered correctly on only 0 of 25 questions. It is tuned for code generation, not natural language Q&A, making it a poor fit for a customer support bot.
 
 ### deepseek-coder
 
 - **Correctness:** 0.480 | **Hallucination:** 8.0% | **Latency:** 5463ms | **Memory:** 46.6MB
-- Suitable for: *[fill in after running evaluation]*
+- **Suitable for:** Latency-sensitive deployments where speed matters more than peak accuracy. Ties with codellama on hallucination rate (8%) but is 2x faster (5463ms vs 11055ms) and uses 55% less memory. A good balance model for real-time chat scenarios where ~0.5 correctness is acceptable.
 
 
 ---
 
 ## 8. Conclusion
 
-> *[To be filled in after running all three models — compare the numbers from Section 3 and 4, and use the trade-off analysis from Section 7 to write a data-driven recommendation.]*
+**Code Llama** achieved the highest accuracy (0.600 correctness, 8.0% hallucination rate, 11 fully correct answers)
+but required the longest latency at 11,055ms average and 103.6MB memory. It is the clear winner on **quality**.
 
+**DeepSeek-Coder** provided the best **speed-quality balance**: correctness of 0.480, same 8.0% hallucination rate as
+Code Llama, but 2x faster (5,463ms) and using 55% less memory (46.6MB). For real-time customer support chat,
+this is the recommended trade-off model.
 
-Example structure:
+**StarCoder2** is unsuitable for this task despite being fast and token-efficient. With only 0/25 correct answers
+and a 12% hallucination rate, it demonstrates that a model specialised for code generation does not transfer
+well to natural language Q&A over structured business documents.
 
-```
-Model A achieved the highest accuracy (X.XXX) and lowest hallucination rate (X.X%),
-but required Xms average latency and XMB memory.
+**Key Insight — Quality-Latency Trade-off:**
+The most accurate model (Code Llama) is NOT the fastest. Choosing between accuracy and speed depends on use case:
+- Customer support (tolerates delays): Code Llama (0.600 accuracy)
+- Live chat / real-time (speed critical): DeepSeek-Coder (0.480 accuracy, 2x faster)
+- Low-resource VM / edge devices: TinyLlama (used in this project's Docker deployment, ~600MB RAM)
 
-Model B showed X% lower accuracy but was X% faster with X% less memory,
-making it a better fit for latency-sensitive deployments.
-
-Model C provided the best balance of [quality/speed/resource usage].
-```
+**Retrieval Quality was identical (0.920) across all 3 models**, confirming that the RAG pipeline
+(ChromaDB + sentence-transformers) is robust and model-independent. The difference in final answer quality
+comes entirely from how well each LLM *reasons over* the retrieved context, not from retrieval failures.
