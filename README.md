@@ -89,22 +89,34 @@ git clone https://github.com/SamradhSahni/ShopBot.git
 cd ShopBot
 ```
 
-### Step 5 — Build the Knowledge Base
+### Step 5 — Build the Knowledge Base (Optional — Docker Does This Automatically!)
 
-This step generates the ChromaDB vector database from the product catalog. Runs **once** on your VM. The `all-MiniLM-L6-v2` model (~80MB) downloads automatically.
+> **💡 Note:** The **RAG Service container automatically indexes the knowledge base on its very first startup**! You can skip directly to **Step 6** without installing any Python packages on your host machine.
 
+If you prefer to build the knowledge base manually on your Ubuntu host VM:
+
+> **Important (Ubuntu PEP 668):** Modern Ubuntu versions block direct `pip install` with `error: externally-managed-environment`. Choose either Option A or Option B:
+
+**Option A — Direct install flag (Quickest):**
 ```bash
-# Install Python dependencies for KB building
-pip install chromadb==0.5.23 sentence-transformers==2.7.0
-
-# Run the knowledge base builder (takes ~30-60 seconds)
+pip3 install chromadb==0.5.23 sentence-transformers==2.7.0 --break-system-packages
 python3 ex2_knowledge_base/build_kb.py
 ```
 
-You should see output like:
+**Option B — Using a virtual environment (Cleanest):**
+```bash
+sudo apt install -y python3-venv
+python3 -m venv venv
+source venv/bin/activate
+pip install chromadb==0.5.23 sentence-transformers==2.7.0
+python3 ex2_knowledge_base/build_kb.py
+deactivate
 ```
-  Total chunks to embed: 63
-  Done! 63 chunks stored in ChromaDB
+
+Expected output:
+```
+  Total chunks to embed: ~44
+  Done! Chunks stored in ChromaDB
   KB built successfully!
 ```
 

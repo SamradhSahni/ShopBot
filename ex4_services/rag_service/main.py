@@ -16,6 +16,8 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 
 CHROMA_PATH = os.getenv("CHROMA_PATH", os.path.join(
     os.path.dirname(__file__), "..", "..", "chroma_db"))
+KB_DIR = os.getenv("KB_DIR", os.path.join(
+    os.path.dirname(__file__), "..", "..", "knowledge_base"))
 COLLECTION_NAME = "shopbot_kb"
 EMBED_MODEL = "all-MiniLM-L6-v2"
 MIN_SIMILARITY = 0.2
@@ -43,6 +45,28 @@ def get_collection():
 
 def embed(text: str) -> List[float]:
     return get_model().encode(text, normalize_embeddings=True).tolist()
+
+
+@app.on_event("startup")
+def init_kb_if_needed():
+    """Auto-populates ChromaDB on startup if empty, so users never need to run host python scripts."""
+    try:
+        col = get_collection()
+        if col.count() == 0 and os.path.exists(KB_DIR):
+            print(f"[*] ChromaDB collection '{COLLECTION_NAME}' is empty. Auto-indexing knowledge base from {KB_DIR}...")
+            from chunker import load_all_chunks
+            chunks = load_all_chunks(KB_DIR)
+            if chunks:
+                texts = [c["text"] for c in chunks]
+                ids = [c["id"] for c in chunks]
+                metadatas = [c["metadata"] for c in chunks]
+                embeddings = get_model().encode(texts, normalize_embeddings=True).tolist()
+                col.add(ids=ids, embeddings=embeddings, documents=texts, metadatas=metadatas)
+                print(f"[✓] Knowledge base auto-indexed! {col.count()} chunks stored in ChromaDB.")
+        else:
+            print(f"[✓] ChromaDB ready with {col.count()} chunks.")
+    except Exception as e:
+        print(f"[!] Warning during knowledge base initialization: {e}")
 
 
 class RetrieveRequest(BaseModel):

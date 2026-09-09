@@ -26,12 +26,16 @@ echo "[2/5] Pulling tinyllama model (~600MB)..."
 ollama pull tinyllama
 echo "  tinyllama ready."
 
-# 3. Build the knowledge base (sentence-transformers based, no Ollama needed)
+# 3. Knowledge base preparation
 echo ""
-echo "[3/5] Building knowledge base (ChromaDB)..."
-pip install --quiet chromadb==0.5.23 sentence-transformers==2.7.0
-python ex2_knowledge_base/build_kb.py
-echo "  Knowledge base built at ./chroma_db"
+echo "[3/5] Preparing knowledge base..."
+# If python packages can be installed on host, build locally; otherwise Docker container auto-indexes on startup
+if pip3 install --quiet chromadb==0.5.23 sentence-transformers==2.7.0 --break-system-packages 2>/dev/null; then
+    python3 ex2_knowledge_base/build_kb.py 2>/dev/null || true
+    echo "  Knowledge base pre-built at ./chroma_db"
+else
+    echo "  (Host pip is externally-managed — RAG service will auto-build ChromaDB inside Docker on startup)"
+fi
 
 # 4. Build and start Docker containers
 echo ""

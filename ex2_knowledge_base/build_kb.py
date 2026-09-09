@@ -26,8 +26,8 @@ sys.path.insert(0, os.path.dirname(__file__))
 from chunker import load_all_chunks
 from embedder import store_chunks, get_collection_stats, get_chroma_collection
 
-KB_DIR = os.path.join(os.path.dirname(__file__), "..", "knowledge_base")
-CHROMA_PATH = os.path.join(os.path.dirname(__file__), "chroma_db")
+KB_DIR = os.getenv("KB_DIR", os.path.join(os.path.dirname(__file__), "..", "knowledge_base"))
+CHROMA_PATH = os.getenv("CHROMA_PATH", os.path.join(os.path.dirname(__file__), "..", "chroma_db"))
 
 
 def print_sample_chunks(chunks, n=3):

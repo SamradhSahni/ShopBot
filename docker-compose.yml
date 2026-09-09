@@ -34,10 +34,11 @@ services:
     ports:
       - "8011:8001"
     volumes:
-      # Mount the shared chroma_db built by build_kb.py
-      - ./chroma_db:/app/chroma_db:ro
+      - ./chroma_db:/app/chroma_db
+      - ./knowledge_base:/app/knowledge_base:ro
     environment:
       - CHROMA_PATH=/app/chroma_db
+      - KB_DIR=/app/knowledge_base
     networks:
       - shopbot-net
     healthcheck:
