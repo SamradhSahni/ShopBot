@@ -1,4 +1,4 @@
-"""
+﻿"""
 evaluator.py — Quantitative evaluation of ShopBot across 3 LLM models
 Week 4, Exercise 3: Correctness, Relevance, Retrieval Quality, Hallucination Rate,
                     Latency, Token Usage, Memory Consumption
@@ -22,7 +22,7 @@ from retriever import retrieve
 
 QUESTIONS_PATH = os.path.join(os.path.dirname(__file__), "questions.json")
 RESULTS_DIR    = os.path.join(os.path.dirname(__file__), "results")
-SUPPORTED_MODELS = ["codellama", "starcoder2", "deepseek-coder"]
+SUPPORTED_MODELS = ["tinyllama", "qwen2:0.5b", "gemma:2b"]
 
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
@@ -340,14 +340,14 @@ def print_model_summary(data: dict):
 
 def main():
     parser = argparse.ArgumentParser(description="ShopBot Model Evaluator")
-    parser.add_argument("--model", choices=SUPPORTED_MODELS, help="Model to evaluate")
-    parser.add_argument("--all", action="store_true", help="Evaluate all 3 models")
+    parser.add_argument("--model", help="Model to evaluate (any Ollama model name)")
+    parser.add_argument("--all", action="store_true", help="Evaluate all 3 lightweight VM models (tinyllama, qwen2:0.5b, gemma:2b)")
     args = parser.parse_args()
 
     with open(QUESTIONS_PATH, "r", encoding="utf-8") as f:
         questions = json.load(f)
 
-    models_to_run = SUPPORTED_MODELS if args.all else ([args.model] if args.model else ["codellama"])
+    models_to_run = SUPPORTED_MODELS if args.all else ([args.model] if args.model else ["tinyllama"])
 
     all_summaries = []
     for model in models_to_run:
@@ -356,8 +356,8 @@ def main():
         save_results(model, data)
         all_summaries.append(data["summary"])
 
-    # If all models ran, print comparison
-    if len(all_summaries) == 3:
+    # If multiple models ran, print comparison
+    if len(all_summaries) >= 2:
         print(f"\n{'═'*65}")
         print("  📊 CROSS-MODEL COMPARISON")
         print(f"{'═'*65}")
