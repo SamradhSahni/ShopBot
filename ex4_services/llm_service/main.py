@@ -40,7 +40,7 @@ class GenerateRequest(BaseModel):
     context: Optional[str] = None        # If provided, uses RAG prompt
     question: Optional[str] = None       # Original question for RAG prompt
     temperature: Optional[float] = 0.3
-    max_tokens: Optional[int] = 256      # Keep short for low-RAM VMs
+    max_tokens: Optional[int] = 128      # Keep short for low-RAM VMs
 
 
 class GenerateResponse(BaseModel):
@@ -91,8 +91,9 @@ def generate(request: GenerateRequest):
         "stream": False,
         "options": {
             "temperature": request.temperature,
-            "num_predict": request.max_tokens,
-            "num_ctx": 2048,       # Reduced context window to save RAM
+            "num_predict": min(request.max_tokens or 128, 128),  # Short responses (saves RAM & time)
+            "num_ctx": 512,                                      # Small 512 context (reduces KV cache RAM by 75%)
+            "num_thread": 2,                                     # Limit to 2 CPU threads so VM desktop never freezes
         }
     }
 
