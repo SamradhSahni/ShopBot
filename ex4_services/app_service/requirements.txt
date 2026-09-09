@@ -1,6 +1,5 @@
-﻿fastapi
+fastapi
 uvicorn[standard]
 requests
 pydantic
 httpx
-chromadb
