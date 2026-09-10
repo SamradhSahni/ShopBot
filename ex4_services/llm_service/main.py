@@ -18,20 +18,20 @@ OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
 DEFAULT_MODEL = os.getenv("DEFAULT_MODEL", "tinyllama")
 
 SYSTEM_PROMPT = """You are ShopBot, TechMart's helpful customer support assistant.
-Be concise and accurate. Use only the product information provided to you.
-If you don't know something, say so — never invent product names, prices, or policies."""
+Answer in plain, friendly English. Do NOT include markdown headers (##, ###), source labels,
+or phrases like 'STORE INFORMATION'. Give a direct, complete answer in 2-4 sentences.
+Never invent product names, prices, or policies. If unsure, say so."""
 
 RAG_PROMPT_TEMPLATE = """You are ShopBot, TechMart's AI support assistant.
-Answer the customer's question using ONLY the store information below.
-If the answer is not in the context, say you don't have that information.
+Using ONLY the store information below, write a short, friendly plain-English answer.
+Do NOT repeat source labels or markdown formatting. Do NOT start with "Sure" or "Certainly".
+If the information is not in the context, say: "I don't have that information."
 
---- STORE INFORMATION ---
+Store Information:
 {context}
---- END OF STORE INFORMATION ---
 
-Customer Question: {question}
-
-Answer:"""
+Customer: {question}
+ShopBot:"""
 
 
 class GenerateRequest(BaseModel):
@@ -91,8 +91,8 @@ def generate(request: GenerateRequest):
         "stream": False,
         "options": {
             "temperature": request.temperature,
-            "num_predict": min(request.max_tokens or 128, 128),  # Short responses (saves RAM & time)
-            "num_ctx": 512,                                      # Small 512 context (reduces KV cache RAM by 75%)
+            "num_predict": min(request.max_tokens or 192, 192),  # 192 tokens — enough for a full answer without truncation
+            "num_ctx": 768,                                      # Slightly larger context fits prompt + answer cleanly
             "num_thread": 2,                                     # Limit to 2 CPU threads so VM desktop never freezes
         }
     }
