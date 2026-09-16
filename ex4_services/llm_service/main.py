@@ -40,7 +40,7 @@ class GenerateRequest(BaseModel):
     context: Optional[str] = None        # If provided, uses RAG prompt
     question: Optional[str] = None       # Original question for RAG prompt
     temperature: Optional[float] = 0.3
-    max_tokens: Optional[int] = 128      # Keep short for low-RAM VMs
+    max_tokens: Optional[int] = -1       # -1 = unlimited, let the LLM decide response length
 
 
 class GenerateResponse(BaseModel):
@@ -91,9 +91,9 @@ def generate(request: GenerateRequest):
         "stream": False,
         "options": {
             "temperature": request.temperature,
-            "num_predict": min(request.max_tokens or 192, 192),  # 192 tokens — enough for a full answer without truncation
-            "num_ctx": 768,                                      # Slightly larger context fits prompt + answer cleanly
-            "num_thread": 2,                                     # Limit to 2 CPU threads so VM desktop never freezes
+            "num_predict": request.max_tokens if request.max_tokens and request.max_tokens > 0 else -1,  # -1 = unlimited
+            "num_ctx": 4096,   # Full context window for detailed responses
+            "num_thread": 4,   # 4 threads out of 6 vCPUs — fast without hogging the desktop
         }
     }
 
