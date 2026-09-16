@@ -133,6 +133,65 @@
       outline: none;
     }
 
+    /* ── RAG Toggle ── */
+    .rag-toggle-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .rag-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    #ragToggleBtn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1.5px solid var(--success);
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--success);
+      font-size: 12px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      outline: none;
+      white-space: nowrap;
+    }
+
+    #ragToggleBtn.rag-off {
+      border-color: var(--text-muted);
+      background: rgba(71,85,105,0.15);
+      color: var(--text-muted);
+    }
+
+    #ragToggleBtn:hover {
+      transform: scale(1.04);
+      box-shadow: 0 0 8px rgba(16,185,129,0.3);
+    }
+
+    #ragToggleBtn.rag-off:hover {
+      box-shadow: 0 0 8px rgba(71,85,105,0.3);
+    }
+
+    .rag-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--success);
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    #ragToggleBtn.rag-off .rag-dot {
+      background: var(--text-muted);
+    }
+
     /* ── Main Layout ── */
     main {
       flex: 1;
@@ -449,10 +508,16 @@
     <div class="model-selector">
       <span class="model-label">Model:</span>
       <select id="modelSelect">
-        <option value="tinyllama" selected>TinyLlama (1.1B — Fast)</option>
-        <option value="phi3:mini">Phi-3 Mini (3.8B)</option>
-        <option value="qwen2:0.5b">Qwen2 (0.5B)</option>
+        <option value="starcoder" selected>StarCoder (Code-focused)</option>
+        <option value="codellama">CodeLlama (7B)</option>
+        <option value="deepseek-coder">DeepSeek-Coder (6.7B)</option>
       </select>
+    </div>
+    <div class="rag-toggle-wrap">
+      <span class="rag-label">RAG:</span>
+      <button id="ragToggleBtn" onclick="toggleRag()" title="Toggle Retrieval-Augmented Generation">
+        <span class="rag-dot"></span><span id="ragToggleLabel">ON</span>
+      </button>
     </div>
     <div class="status-badge">
       <div class="status-dot" id="statusDot"></div>
@@ -510,7 +575,7 @@
         </div>
         <div class="stat-row">
           <span class="stat-label">RAG Engine</span>
-          <span class="stat-value" style="color:#10b981;">Active (ChromaDB)</span>
+          <span class="stat-value" id="sidebarRagStatus" style="color:#10b981;">ON (ChromaDB)</span>
         </div>
       </div>
     </div>
@@ -554,6 +619,26 @@
   let totalLatency = 0;
   let totalTokens = 0;
   let isWaiting = false;
+  let ragEnabled = true;
+
+  // ── RAG Toggle ─────────────────────────────────────────────────────────────
+  function toggleRag() {
+    ragEnabled = !ragEnabled;
+    const btn = document.getElementById('ragToggleBtn');
+    const label = document.getElementById('ragToggleLabel');
+    const sidebar = document.getElementById('sidebarRagStatus');
+    if (ragEnabled) {
+      btn.classList.remove('rag-off');
+      label.textContent = 'ON';
+      sidebar.textContent = 'ON (ChromaDB)';
+      sidebar.style.color = '#10b981';
+    } else {
+      btn.classList.add('rag-off');
+      label.textContent = 'OFF';
+      sidebar.textContent = 'OFF (Direct LLM)';
+      sidebar.style.color = '#f59e0b';
+    }
+  }
 
   // ── Health Check ───────────────────────────────────────────────────────────
   async function checkHealth() {
@@ -680,7 +765,7 @@
       const res = await fetch('/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message, model, use_rag: true }),
+        body: JSON.stringify({ message, model, use_rag: ragEnabled }),
       });
       const data = await res.json();
 

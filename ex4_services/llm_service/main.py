@@ -1,7 +1,7 @@
 """
 main.py — LLM Service
-Uses tinyllama (1.1B) as default — extremely lightweight, runs on ~600MB RAM.
-Supports any Ollama-compatible model via the 'model' request field.
+Supports starcoder, codellama, deepseek-coder (and any Ollama-compatible model).
+Default model is set via DEFAULT_MODEL env var (falls back to deepseek-coder).
 Port: 8002
 """
 
@@ -15,7 +15,7 @@ app = FastAPI(title="ShopBot LLM Service", version="2.0.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
-DEFAULT_MODEL = os.getenv("DEFAULT_MODEL", "tinyllama")
+DEFAULT_MODEL = os.getenv("DEFAULT_MODEL", "deepseek-coder")
 
 SYSTEM_PROMPT = """You are ShopBot, TechMart's helpful customer support assistant.
 Answer in plain, friendly English. Do NOT include markdown headers (##, ###), source labels,
