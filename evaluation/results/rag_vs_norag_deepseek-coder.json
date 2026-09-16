@@ -1,0 +1,1201 @@
+{
+  "model": "deepseek-coder",
+  "top_k": 3,
+  "total_questions": 25,
+  "evaluated_at": "2026-09-16T22:00:33",
+  "rag_summary": {
+    "avg_correctness": 0.44,
+    "avg_relevance": 0.6844,
+    "avg_latency_ms": 4584.2,
+    "avg_tokens": 65.52,
+    "hallucination_rate": 0.08,
+    "correct_count": 7,
+    "partial_count": 8
+  },
+  "no_rag_summary": {
+    "avg_correctness": 0.04,
+    "avg_relevance": 0.4448,
+    "avg_latency_ms": 2615.76,
+    "avg_tokens": 77.92,
+    "hallucination_rate": 0.0,
+    "correct_count": 0,
+    "partial_count": 2
+  },
+  "per_question": [
+    {
+      "id": "Q01",
+      "category": "Product Information",
+      "question": "What are the specifications of the Dell XPS 15 laptop?",
+      "ground_truth": "Intel Core i7-13700H, 16GB DDR5 RAM, 512GB NVMe SSD, NVIDIA RTX 4060 8GB, 15.6 inch OLED 3.5K display",
+      "requires_rag": true,
+      "hallucination_trap": false,
+      "rag": {
+        "mode": "rag",
+        "response": "The Dell XPS 15 Laptop has the following specifications:\n\n- Processor: Intel Core i7-13700H\n- RAM: 16GB DDR5 RAM\n- Storage: 512GB NVMe SSD\n- GPU: NVIDIA RTX 4060 8GB\n- Display: 15.6\" OLED 3.5K display\n- Warranty: 2 years manufacturer warranty with on-site support\n- Availability: In Stock\n- Customer Rating: 4.7/5\n\nThe Dell XPS 15 Laptop is a high-end laptop with a sleek design and powerful performance. It has a 13-inch OLED 3.5K display, 16GB of RAM, and NVIDIA RTX 4060 8GB GPU. It also comes with a 2-year warranty and is in stock.",
+        "latency_ms": 49271,
+        "tokens_used": 204,
+        "chunks_retrieved": 3,
+        "chunks": [
+          {
+            "text": "Product: Dell XPS 15 Laptop. Category: Laptops. Price: $1499.99 USD. SKU: DELL-XPS15-13700H. Specifications: Intel Core i7-13700H, 16GB DDR5 RAM, 512GB NVMe SSD, NVIDIA RTX 4060 8GB, 15.6\" OLED 3.5K d",
+            "source": "products.json",
+            "similarity": 0.7787
+          },
+          {
+            "text": "Product: Lenovo ThinkPad E15. Category: Laptops. Price: $849.99 USD. SKU: LENOVO-TPE15-I5. Specifications: Intel Core i5-1235U, 8GB DDR4 RAM, 256GB SSD, 15.6\" FHD IPS display, fingerprint reader. Warr",
+            "source": "products.json",
+            "similarity": 0.6416
+          },
+          {
+            "text": "Product: Apple MacBook Pro 14\". Category: Laptops. Price: $1999.99 USD. SKU: APPLE-MBP14-M3PRO. Specifications: Apple M3 Pro chip, 18GB unified memory, 512GB SSD, 14\" Liquid Retina XDR display, 18hr b",
+            "source": "products.json",
+            "similarity": 0.5738
+          }
+        ],
+        "correctness": 1.0,
+        "relevance": 0.9,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      },
+      "no_rag": {
+        "mode": "no_rag",
+        "response": "I'm sorry, but as an AI developed by TechMart, I don't have real-time access to specific product specifications or reviews. I can only provide information based on the data I was trained on. \n\nHowever, I can tell you that Dell XPS 15 is a mid-range laptop that is known for its performance and features. It has a 15.6\" touchscreen display, a 15.6-inch touchscreen with a resolution of 3840x2160 pixels. It has a Core i5 processor, 8GB of RAM, and a 512GB SSD. It also has Windows 10 Home edition.\n\nFor more accurate specifications, I recommend checking Dell's official website or contacting their customer service.",
+        "latency_ms": 3449,
+        "tokens_used": 171,
+        "chunks_retrieved": 0,
+        "correctness": 0.5,
+        "relevance": 0.9,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      }
+    },
+    {
+      "id": "Q02",
+      "category": "Product Information",
+      "question": "How much does the Sony WH-1000XM5 headphones cost?",
+      "ground_truth": "$349.99 USD",
+      "requires_rag": true,
+      "hallucination_trap": false,
+      "rag": {
+        "mode": "rag",
+        "response": "I'm sorry, but as an AI, I don't have access to real-time data or the ability to fetch product information from a file or database. Therefore, I can't provide the cost of the Sony WH-1000XM5 headphones. I recommend checking the product on Amazon or another shopping platform for the most accurate price.",
+        "latency_ms": 2838,
+        "tokens_used": 76,
+        "chunks_retrieved": 3,
+        "chunks": [
+          {
+            "text": "Product: Sony WH-1000XM5 Headphones. Category: Audio. Price: $349.99 USD. SKU: SONY-WH1000XM5. Specifications: Industry-leading noise cancelling, 30hr battery, Bluetooth 5.2, LDAC, multipoint connecti",
+            "source": "products.json",
+            "similarity": 0.807
+          },
+          {
+            "text": "Product: Apple AirPods Pro (2nd Gen). Category: Audio. Price: $249.99 USD. SKU: APPLE-APP2-GEN2. Specifications: H2 chip, Active Noise Cancellation, Adaptive Audio, Spatial Audio, 6hr ANC battery (30h",
+            "source": "products.json",
+            "similarity": 0.5655
+          },
+          {
+            "text": "Product: Samsung 65\" QLED 4K TV. Category: Televisions. Price: $899.99 USD. SKU: SAMSUNG-65Q80C. Specifications: 4K UHD QLED, HDR10+, Quantum Processor 4K, 120Hz, Smart TV with Tizen OS, 4x HDMI 2.1. ",
+            "source": "products.json",
+            "similarity": 0.5518
+          }
+        ],
+        "correctness": 0.0,
+        "relevance": 0.8,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      },
+      "no_rag": {
+        "mode": "no_rag",
+        "response": "I'm sorry for any confusion, but as an AI, I don't have real-time access to current product prices or inventory data. I'm designed to provide information and answer questions based on pre-existing knowledge and data. I recommend checking the latest prices on the Sony's official website or in the app store.",
+        "latency_ms": 2623,
+        "tokens_used": 71,
+        "chunks_retrieved": 0,
+        "correctness": 0.0,
+        "relevance": 0.2,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      }
+    },
+    {
+      "id": "Q03",
+      "category": "Product Information",
+      "question": "Which laptops are currently in stock at TechMart?",
+      "ground_truth": "Dell XPS 15, Apple MacBook Pro 14 inch, and Lenovo ThinkPad E15 are all in stock",
+      "requires_rag": true,
+      "hallucination_trap": false,
+      "rag": {
+        "mode": "rag",
+        "response": "I'm sorry, but as an AI, I don't have real-time access to external databases or the ability to browse the internet. Therefore, I can't provide the current inventory of laptops at TechMart. I recommend checking TechMart's official website or contacting their customer service for the most accurate and up-to-date information.",
+        "latency_ms": 2761,
+        "tokens_used": 77,
+        "chunks_retrieved": 3,
+        "chunks": [
+          {
+            "text": "# TechMart Store Policies",
+            "source": "policies.md",
+            "similarity": 0.692
+          },
+          {
+            "text": "Product: Dell XPS 15 Laptop. Category: Laptops. Price: $1499.99 USD. SKU: DELL-XPS15-13700H. Specifications: Intel Core i7-13700H, 16GB DDR5 RAM, 512GB NVMe SSD, NVIDIA RTX 4060 8GB, 15.6\" OLED 3.5K d",
+            "source": "products.json",
+            "similarity": 0.6801
+          },
+          {
+            "text": "Product: Lenovo ThinkPad E15. Category: Laptops. Price: $849.99 USD. SKU: LENOVO-TPE15-I5. Specifications: Intel Core i5-1235U, 8GB DDR4 RAM, 256GB SSD, 15.6\" FHD IPS display, fingerprint reader. Warr",
+            "source": "products.json",
+            "similarity": 0.676
+          }
+        ],
+        "correctness": 0.0,
+        "relevance": 0.48,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      },
+      "no_rag": {
+        "mode": "no_rag",
+        "response": "I'm sorry for any confusion, but as an AI, I don't have real-time access to databases or the ability to browse the internet in real-time. I can only provide information based on the data I was trained on. I can't provide current stock information or any other real-time data. I recommend checking TechMart's official website or contacting them directly for the most accurate and up-to-date information.",
+        "latency_ms": 2774,
+        "tokens_used": 94,
+        "chunks_retrieved": 0,
+        "correctness": 0.0,
+        "relevance": 0.48,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      }
+    },
+    {
+      "id": "Q04",
+      "category": "Product Information",
+      "question": "What is the warranty on the Samsung 65 inch QLED TV?",
+      "ground_truth": "1 year manufacturer warranty",
+      "requires_rag": true,
+      "hallucination_trap": false,
+      "rag": {
+        "mode": "rag",
+        "response": "I'm sorry, but as an AI, I don't have access to real-time data or the ability to browse the internet. Therefore, I can't provide the warranty details for the Samsung 65\" QLED 4K TV. I recommend contacting TechMart directly or visiting their website to get the most accurate and up-to-date information.",
+        "latency_ms": 2777,
+        "tokens_used": 79,
+        "chunks_retrieved": 3,
+        "chunks": [
+          {
+            "text": "Product: Samsung 65\" QLED 4K TV. Category: Televisions. Price: $899.99 USD. SKU: SAMSUNG-65Q80C. Specifications: 4K UHD QLED, HDR10+, Quantum Processor 4K, 120Hz, Smart TV with Tizen OS, 4x HDMI 2.1. ",
+            "source": "products.json",
+            "similarity": 0.8023
+          },
+          {
+            "text": "## Warranty Policy\n\n### Manufacturer Warranty\n- All TechMart products are covered by the **manufacturer's warranty** as specified on each product page.\n- Warranty periods vary by product (see product ",
+            "source": "policies.md",
+            "similarity": 0.6445
+          },
+          {
+            "text": "## Warranty Policy",
+            "source": "policies.md",
+            "similarity": 0.6402
+          }
+        ],
+        "correctness": 0.5,
+        "relevance": 0.72,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      },
+      "no_rag": {
+        "mode": "no_rag",
+        "response": "I'm sorry, but as an AI, I don't have the ability to provide real-time information or updates about specific products such as Samsung's QLED TV. I recommend checking the latest product reviews or contacting Samsung directly for the most accurate information.",
+        "latency_ms": 2484,
+        "tokens_used": 57,
+        "chunks_retrieved": 0,
+        "correctness": 0.0,
+        "relevance": 0.48,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      }
+    },
+    {
+      "id": "Q05",
+      "category": "Product Information",
+      "question": "What is the customer rating of the Sony WH-1000XM5 headphones?",
+      "ground_truth": "4.9 out of 5",
+      "requires_rag": true,
+      "hallucination_trap": false,
+      "rag": {
+        "mode": "rag",
+        "response": "I'm sorry, but as an AI, I don't have real-time access to customer reviews or ratings. However, based on the information provided in the products.json file, the customer rating of the Sony WH-1000XM5 headphones is 4.9/5.",
+        "latency_ms": 2741,
+        "tokens_used": 65,
+        "chunks_retrieved": 3,
+        "chunks": [
+          {
+            "text": "Product: Sony WH-1000XM5 Headphones. Category: Audio. Price: $349.99 USD. SKU: SONY-WH1000XM5. Specifications: Industry-leading noise cancelling, 30hr battery, Bluetooth 5.2, LDAC, multipoint connecti",
+            "source": "products.json",
+            "similarity": 0.8294
+          },
+          {
+            "text": "Product: Samsung 65\" QLED 4K TV. Category: Televisions. Price: $899.99 USD. SKU: SAMSUNG-65Q80C. Specifications: 4K UHD QLED, HDR10+, Quantum Processor 4K, 120Hz, Smart TV with Tizen OS, 4x HDMI 2.1. ",
+            "source": "products.json",
+            "similarity": 0.6018
+          },
+          {
+            "text": "Product: Apple AirPods Pro (2nd Gen). Category: Audio. Price: $249.99 USD. SKU: APPLE-APP2-GEN2. Specifications: H2 chip, Active Noise Cancellation, Adaptive Audio, Spatial Audio, 6hr ANC battery (30h",
+            "source": "products.json",
+            "similarity": 0.5928
+          }
+        ],
+        "correctness": 0.0,
+        "relevance": 1.0,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      },
+      "no_rag": {
+        "mode": "no_rag",
+        "response": "I'm sorry for any misunderstanding, but as an AI, I don't have access to real-time databases or the ability to browse the internet in real-time to provide current product ratings. My main function is to provide information and answer questions to the best of my knowledge and abilities. I recommend checking the latest reviews or ratings on trusted online platforms like Amazon or the product's official website.",
+        "latency_ms": 2800,
+        "tokens_used": 86,
+        "chunks_retrieved": 0,
+        "correctness": 0.0,
+        "relevance": 0.2,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      }
+    },
+    {
+      "id": "Q06",
+      "category": "Return Policy",
+      "question": "Can I return a laptop I have already opened?",
+      "ground_truth": "Yes, if returned within 30 days and in resalable condition with all original accessories",
+      "requires_rag": true,
+      "hallucination_trap": false,
+      "rag": {
+        "mode": "rag",
+        "response": "I'm sorry, but as an AI, I don't have the ability to return items to the store. I can only provide assistance based on the information provided in the FAQs and policies. \n\nFor returning items, you should contact the store directly or use the online return feature available in the store. Please note that the return process can vary depending on the store's policies and the specific product.",
+        "latency_ms": 3029,
+        "tokens_used": 88,
+        "chunks_retrieved": 3,
+        "chunks": [
+          {
+            "text": "Question: Can I return an opened product?\nAnswer: Yes, as long as it's within 30 days and the product is in resalable condition with all original accessories. Opened software and digital codes are not",
+            "source": "faqs.md",
+            "similarity": 0.7638
+          },
+          {
+            "text": "er number or receipt) is required for all returns.\n\n### Non-Returnable Items\n- Opened software licenses and digital download codes are **non-refundable**.\n- Items marked as **\"Final Sale\"** at time of",
+            "source": "policies.md",
+            "similarity": 0.6536
+          },
+          {
+            "text": "## Return & Refund Policy\n\n### Standard Return Window\n- Customers may return eligible items within **30 days** of the delivery date.\n- Items must be in their **original, unused condition** and in **or",
+            "source": "policies.md",
+            "similarity": 0.6378
+          }
+        ],
+        "correctness": 0.0,
+        "relevance": 0.48,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      },
+      "no_rag": {
+        "mode": "no_rag",
+        "response": "I'm sorry for any confusion, but as an AI, I don't have the ability to return a laptop. I'm designed to provide assistance with technical questions and problems. I recommend contacting TechMart's customer service or directly contacting the laptop manufacturer for assistance.",
+        "latency_ms": 2493,
+        "tokens_used": 60,
+        "chunks_retrieved": 0,
+        "correctness": 0.0,
+        "relevance": 0.72,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      }
+    },
+    {
+      "id": "Q07",
+      "category": "Return Policy",
+      "question": "How many days do I have to return a product?",
+      "ground_truth": "30 days from the delivery date",
+      "requires_rag": true,
+      "hallucination_trap": false,
+      "rag": {
+        "mode": "rag",
+        "response": "As an AI, I don't have physical access to the store or the ability to return items. However, based on the information provided in the store policies and FAQs, you can return an item within 30 days if it's in a resizable condition and if it was not defective. If the item is defective or damaged, you should contact us within 7 days of delivery.",
+        "latency_ms": 2828,
+        "tokens_used": 86,
+        "chunks_retrieved": 3,
+        "chunks": [
+          {
+            "text": "## Return & Refund Policy\n\n### Standard Return Window\n- Customers may return eligible items within **30 days** of the delivery date.\n- Items must be in their **original, unused condition** and in **or",
+            "source": "policies.md",
+            "similarity": 0.7844
+          },
+          {
+            "text": "Question: Can I return an opened product?\nAnswer: Yes, as long as it's within 30 days and the product is in resalable condition with all original accessories. Opened software and digital codes are not",
+            "source": "faqs.md",
+            "similarity": 0.7677
+          },
+          {
+            "text": "order systems cannot be returned unless defective.\n\n### Defective or Damaged Items\n- If an item arrives damaged or defective, contact us within **7 days** of delivery.\n- We will arrange a free return ",
+            "source": "policies.md",
+            "similarity": 0.7236
+          }
+        ],
+        "correctness": 0.5,
+        "relevance": 0.72,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      },
+      "no_rag": {
+        "mode": "no_rag",
+        "response": "I'm sorry, but as an AI, I don't have access to personal data about individuals unless it has been shared with me in the course of our conversation. I am designed to respect user privacy and confidentiality. Therefore, I can't provide the number of days you have to return a product. My primary function is to provide information and answer questions to the best of my knowledge and abilities. If you have any questions about ShopBot or any other topic, feel free to ask!",
+        "latency_ms": 2751,
+        "tokens_used": 103,
+        "chunks_retrieved": 0,
+        "correctness": 0.0,
+        "relevance": 0.96,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      }
+    },
+    {
+      "id": "Q08",
+      "category": "Return Policy",
+      "question": "Are digital downloads and software licenses refundable?",
+      "ground_truth": "No, opened software licenses and digital download codes are non-refundable",
+      "requires_rag": true,
+      "hallucination_trap": false,
+      "rag": {
+        "mode": "rag",
+        "response": "Yes, digital downloads and software licenses are refundable. However, it's important to note that the return policy can vary depending on the product and the store. For the most accurate information, please refer to the store's policies or contact their customer service.",
+        "latency_ms": 2629,
+        "tokens_used": 56,
+        "chunks_retrieved": 3,
+        "chunks": [
+          {
+            "text": "er number or receipt) is required for all returns.\n\n### Non-Returnable Items\n- Opened software licenses and digital download codes are **non-refundable**.\n- Items marked as **\"Final Sale\"** at time of",
+            "source": "policies.md",
+            "similarity": 0.7078
+          },
+          {
+            "text": "Question: Can I return an opened product?\nAnswer: Yes, as long as it's within 30 days and the product is in resalable condition with all original accessories. Opened software and digital codes are not",
+            "source": "faqs.md",
+            "similarity": 0.6534
+          },
+          {
+            "text": "Question: Where can I find product manuals?\nAnswer: Digital manuals are available on each product page under \"Downloads\". Physical manuals are included in the product box.",
+            "source": "faqs.md",
+            "similarity": 0.6087
+          }
+        ],
+        "correctness": 1.0,
+        "relevance": 1.0,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      },
+      "no_rag": {
+        "mode": "no_rag",
+        "response": "I'm sorry, but as an AI, I don't have access to real-time databases or the ability to provide current information about specific products or services. I'm designed to provide information based on pre-existing knowledge and data. I recommend checking the latest terms and conditions of the product you're referring to for the most accurate information.",
+        "latency_ms": 2617,
+        "tokens_used": 75,
+        "chunks_retrieved": 0,
+        "correctness": 0.0,
+        "relevance": 0.0,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      }
+    },
+    {
+      "id": "Q09",
+      "category": "Return Policy",
+      "question": "How long does it take to receive a refund after returning a product?",
+      "ground_truth": "Refunds are processed within 5 to 7 business days after receiving the return, with an additional 3 to 5 business days for credit card refunds",
+      "requires_rag": true,
+      "hallucination_trap": false,
+      "rag": {
+        "mode": "rag",
+        "response": "Refunds are processed within 5–7 business days after we receive the returned item. Credit card refunds appear within an additional 3–5 business days depending on your bank.",
+        "latency_ms": 2468,
+        "tokens_used": 40,
+        "chunks_retrieved": 3,
+        "chunks": [
+          {
+            "text": "Question: How long does it take to receive my refund?\nAnswer: Refunds are processed within 5–7 business days after we receive the returned item. Credit card refunds appear within an additional 3–5 bus",
+            "source": "faqs.md",
+            "similarity": 0.7949
+          },
+          {
+            "text": "ff the package at any authorised courier location.\n\n### Refund Processing\n- Refunds are processed within **5–7 business days** after we receive and inspect the returned item.\n- Refunds are issued to t",
+            "source": "policies.md",
+            "similarity": 0.7759
+          },
+          {
+            "text": "## Return & Refund Policy\n\n### Standard Return Window\n- Customers may return eligible items within **30 days** of the delivery date.\n- Items must be in their **original, unused condition** and in **or",
+            "source": "policies.md",
+            "similarity": 0.7503
+          }
+        ],
+        "correctness": 1.0,
+        "relevance": 0.45,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      },
+      "no_rag": {
+        "mode": "no_rag",
+        "response": "I'm sorry, but as an AI, I don't have access to personal data about individuals unless it has been shared with me in the course of our conversation. I am designed to respect user privacy and confidentiality. Therefore, I can't provide the information you're looking for.",
+        "latency_ms": 2609,
+        "tokens_used": 63,
+        "chunks_retrieved": 0,
+        "correctness": 0.0,
+        "relevance": 0.0,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      }
+    },
+    {
+      "id": "Q10",
+      "category": "Return Policy",
+      "question": "What condition must a product be in for a return to be accepted?",
+      "ground_truth": "Original unused condition with all accessories, manuals, and original packaging included",
+      "requires_rag": true,
+      "hallucination_trap": false,
+      "rag": {
+        "mode": "rag",
+        "response": "Yes, as long as the product is in its original, unused condition and in its original packaging with all accessories, manuals, and documentation included.",
+        "latency_ms": 2432,
+        "tokens_used": 32,
+        "chunks_retrieved": 3,
+        "chunks": [
+          {
+            "text": "Question: Can I return an opened product?\nAnswer: Yes, as long as it's within 30 days and the product is in resalable condition with all original accessories. Opened software and digital codes are not",
+            "source": "faqs.md",
+            "similarity": 0.7502
+          },
+          {
+            "text": "## Return & Refund Policy\n\n### Standard Return Window\n- Customers may return eligible items within **30 days** of the delivery date.\n- Items must be in their **original, unused condition** and in **or",
+            "source": "policies.md",
+            "similarity": 0.7453
+          },
+          {
+            "text": "Question: Can I exchange a product instead of returning it?\nAnswer: Currently, we don't offer direct exchanges. Return the item for a refund and place a new order for the desired product.\n\n---\n\n## Pro",
+            "source": "faqs.md",
+            "similarity": 0.7024
+          }
+        ],
+        "correctness": 1.0,
+        "relevance": 0.4,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      },
+      "no_rag": {
+        "mode": "no_rag",
+        "response": "ERROR:HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=300)",
+        "latency_ms": 0,
+        "tokens_used": 0,
+        "chunks_retrieved": 0,
+        "correctness": 0.0,
+        "relevance": 0.0,
+        "hallucinated": false,
+        "hallucination_notes": "HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=300)"
+      }
+    },
+    {
+      "id": "Q11",
+      "category": "Shipping",
+      "question": "How much does express shipping cost?",
+      "ground_truth": "$9.99 USD for 2 to 3 business day delivery",
+      "requires_rag": true,
+      "hallucination_trap": false,
+      "rag": {
+        "mode": "rag",
+        "response": "Express Shipping: Delivery in 2-3 business days. Cost: $9.99 USD.",
+        "latency_ms": 2451,
+        "tokens_used": 25,
+        "chunks_retrieved": 3,
+        "chunks": [
+          {
+            "text": "Domestic Shipping — Express Shipping: Delivery in 2-3 business days. Cost: $9.99 USD.  P.O. Box allowed: No. Cut-off time: 2:00 PM EST. Physical address required. Not available for all products.",
+            "source": "shipping_zones.json",
+            "similarity": 0.7829
+          },
+          {
+            "text": "International Shipping — Rest of World: Delivery in 14-21 business days. Cost: $39.99 USD. Carrier: DHL Express. Note: Customer responsible for all import duties and taxes.",
+            "source": "shipping_zones.json",
+            "similarity": 0.7373
+          },
+          {
+            "text": "International Shipping — Asia Pacific: Delivery in 10-18 business days. Cost: $34.99 USD. Carrier: FedEx International. Note: Customer responsible for all import duties and taxes.",
+            "source": "shipping_zones.json",
+            "similarity": 0.7322
+          }
+        ],
+        "correctness": 1.0,
+        "relevance": 0.72,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      },
+      "no_rag": {
+        "mode": "no_rag",
+        "response": "I'm sorry for any confusion, but as an AI, I don't have access to real-time databases or the ability to provide current shipping costs or rates. I'm designed to provide information and answer questions based on pre-existing knowledge. I recommend checking the latest shipping rates on a shipping calculator or a shipping company's website.",
+        "latency_ms": 2604,
+        "tokens_used": 75,
+        "chunks_retrieved": 0,
+        "correctness": 0.0,
+        "relevance": 0.48,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      }
+    },
+    {
+      "id": "Q12",
+      "category": "Shipping",
+      "question": "What is the minimum order value for free shipping?",
+      "ground_truth": "$50 USD. Orders over $50 receive free standard shipping",
+      "requires_rag": true,
+      "hallucination_trap": false,
+      "rag": {
+        "mode": "rag",
+        "response": "I'm sorry, but as an AI, I don't have access to specific store information or shipping zones. I can only provide information based on the information provided in the context. However, I can tell you that the minimum order value for free shipping is usually $10.",
+        "latency_ms": 2752,
+        "tokens_used": 60,
+        "chunks_retrieved": 3,
+        "chunks": [
+          {
+            "text": "Question: Is there a minimum order value?\nAnswer: No minimum order value. However, orders under $50 incur a $4.99 standard shipping fee.",
+            "source": "faqs.md",
+            "similarity": 0.8099
+          },
+          {
+            "text": "Question: Do you offer free shipping?\nAnswer: Yes! Standard shipping is free on all orders over $50 within the United States.",
+            "source": "faqs.md",
+            "similarity": 0.7407
+          },
+          {
+            "text": "Domestic Shipping — Standard Shipping: Delivery in 5-7 business days. Cost: $4.99 USD. Free on orders over $50.0. P.O. Box allowed: Yes. Cut-off time: 2:00 PM EST. Free on orders over $50. Same-day di",
+            "source": "shipping_zones.json",
+            "similarity": 0.7219
+          }
+        ],
+        "correctness": 0.0,
+        "relevance": 1.0,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      },
+      "no_rag": {
+        "mode": "no_rag",
+        "response": "I'm sorry, but as an AI, I don't have access to real-time data or the ability to provide current shipping rates or minimum order values. I'm designed to assist with technical and programming-related questions. I recommend checking with the shipping company or the website of the product you're interested in to get the most accurate information.",
+        "latency_ms": 2701,
+        "tokens_used": 75,
+        "chunks_retrieved": 0,
+        "correctness": 0.0,
+        "relevance": 0.8,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      }
+    },
+    {
+      "id": "Q13",
+      "category": "Shipping",
+      "question": "How long does standard shipping take?",
+      "ground_truth": "5 to 7 business days",
+      "requires_rag": true,
+      "hallucination_trap": false,
+      "rag": {
+        "mode": "rag",
+        "response": "I'm sorry, but as an AI, I don't have access to the data you've provided. I can't provide you with a specific answer based on the shipping zones and policies you've mentioned. However, I can suggest you to refer to the shipping zones and policies in the JSON file you provided. They should give you a clear understanding of the shipping options and costs.",
+        "latency_ms": 2845,
+        "tokens_used": 83,
+        "chunks_retrieved": 3,
+        "chunks": [
+          {
+            "text": "Domestic Shipping — Standard Shipping: Delivery in 5-7 business days. Cost: $4.99 USD. Free on orders over $50.0. P.O. Box allowed: Yes. Cut-off time: 2:00 PM EST. Free on orders over $50. Same-day di",
+            "source": "shipping_zones.json",
+            "similarity": 0.7196
+          },
+          {
+            "text": "## Shipping Policy\n\n### Domestic Shipping Options (United States)\n| Shipping Method | Estimated Delivery | Cost |\n|----------------|-------------------|------|\n| Standard Shipping | 5–7 business days ",
+            "source": "policies.md",
+            "similarity": 0.6909
+          },
+          {
+            "text": "Domestic Shipping — Express Shipping: Delivery in 2-3 business days. Cost: $9.99 USD.  P.O. Box allowed: No. Cut-off time: 2:00 PM EST. Physical address required. Not available for all products.",
+            "source": "shipping_zones.json",
+            "similarity": 0.6604
+          }
+        ],
+        "correctness": 0.0,
+        "relevance": 0.24,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      },
+      "no_rag": {
+        "mode": "no_rag",
+        "response": "I'm sorry, but as an AI, I don't have real-time access to current shipping rates or delivery times. I'm designed to provide information based on pre-existing knowledge and data. I recommend checking the latest shipping rates on the official website of TechMart or contact their customer service for the most accurate information.",
+        "latency_ms": 2742,
+        "tokens_used": 71,
+        "chunks_retrieved": 0,
+        "correctness": 0.0,
+        "relevance": 0.24,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      }
+    },
+    {
+      "id": "Q14",
+      "category": "Shipping",
+      "question": "Does TechMart ship internationally?",
+      "ground_truth": "Yes, TechMart ships to 40+ countries worldwide including Europe, Asia Pacific, Canada, Mexico, and rest of world",
+      "requires_rag": true,
+      "hallucination_trap": false,
+      "rag": {
+        "mode": "rag",
+        "response": "Yes, TechMart does ship internationally. However, it's important to note that not all products are available in all countries due to regional restrictions. Some products may not be available in certain countries due to specific laws or regulations.",
+        "latency_ms": 2596,
+        "tokens_used": 49,
+        "chunks_retrieved": 3,
+        "chunks": [
+          {
+            "text": "|\n| Rest of World | 14–21 business days | $39.99 |\n\n- International customers are responsible for all customs duties and import taxes.\n- TechMart ships to 40+ countries worldwide.\n- Some products (cer",
+            "source": "policies.md",
+            "similarity": 0.8066
+          },
+          {
+            "text": "# TechMart Store Policies",
+            "source": "policies.md",
+            "similarity": 0.7127
+          },
+          {
+            "text": "- Photos of damage may be required for processing.\n\n### Return Process\n1. Log into your TechMart account and go to \"My Orders\".\n2. Select the order and click \"Initiate Return\".\n3. Choose the item(s) a",
+            "source": "policies.md",
+            "similarity": 0.6842
+          }
+        ],
+        "correctness": 0.5,
+        "relevance": 1.0,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      },
+      "no_rag": {
+        "mode": "no_rag",
+        "response": "I'm sorry, but as an AI, I don't have real-time access to current information or data about specific companies or their operations. I'm designed to provide information and answer questions based on pre-existing knowledge and data. I can't provide real-time updates or information about specific companies or their operations. I recommend checking TechMart's official website or contacting them directly for the most accurate and up-to-date information.",
+        "latency_ms": 2894,
+        "tokens_used": 97,
+        "chunks_retrieved": 0,
+        "correctness": 0.0,
+        "relevance": 0.3,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      }
+    },
+    {
+      "id": "Q15",
+      "category": "Shipping",
+      "question": "What is the fastest shipping option and how much does it cost?",
+      "ground_truth": "Overnight shipping at $24.99, delivers next business day for orders placed before 12PM EST",
+      "requires_rag": true,
+      "hallucination_trap": false,
+      "rag": {
+        "mode": "rag",
+        "response": "The fastest shipping option in the United States is Standard Shipping. It takes about 5-7 business days to deliver and costs $4.99.",
+        "latency_ms": 2517,
+        "tokens_used": 33,
+        "chunks_retrieved": 3,
+        "chunks": [
+          {
+            "text": "## Shipping Policy\n\n### Domestic Shipping Options (United States)\n| Shipping Method | Estimated Delivery | Cost |\n|----------------|-------------------|------|\n| Standard Shipping | 5–7 business days ",
+            "source": "policies.md",
+            "similarity": 0.7172
+          },
+          {
+            "text": "International Shipping — Rest of World: Delivery in 14-21 business days. Cost: $39.99 USD. Carrier: DHL Express. Note: Customer responsible for all import duties and taxes.",
+            "source": "shipping_zones.json",
+            "similarity": 0.7032
+          },
+          {
+            "text": "Domestic Shipping — Standard Shipping: Delivery in 5-7 business days. Cost: $4.99 USD. Free on orders over $50.0. P.O. Box allowed: Yes. Cut-off time: 2:00 PM EST. Free on orders over $50. Same-day di",
+            "source": "shipping_zones.json",
+            "similarity": 0.6983
+          }
+        ],
+        "correctness": 0.5,
+        "relevance": 0.69,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      },
+      "no_rag": {
+        "mode": "no_rag",
+        "response": "I'm sorry, but as an AI, I don't have access to real-time data or the ability to provide current shipping rates or costs. I recommend checking the latest shipping rates on a shipping calculator or a shipping company's website.",
+        "latency_ms": 2540,
+        "tokens_used": 54,
+        "chunks_retrieved": 0,
+        "correctness": 0.0,
+        "relevance": 0.34,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      }
+    },
+    {
+      "id": "Q16",
+      "category": "Cross-domain",
+      "question": "What is the total cost of buying the Dell XPS 15 laptop with overnight shipping?",
+      "ground_truth": "$1524.98 USD ($1499.99 + $24.99 overnight shipping)",
+      "requires_rag": true,
+      "hallucination_trap": false,
+      "rag": {
+        "mode": "rag",
+        "response": "The total cost of buying the Dell XPS 15 laptop with overnight shipping is $1499.99 USD.",
+        "latency_ms": 2398,
+        "tokens_used": 29,
+        "chunks_retrieved": 3,
+        "chunks": [
+          {
+            "text": "Product: Dell XPS 15 Laptop. Category: Laptops. Price: $1499.99 USD. SKU: DELL-XPS15-13700H. Specifications: Intel Core i7-13700H, 16GB DDR5 RAM, 512GB NVMe SSD, NVIDIA RTX 4060 8GB, 15.6\" OLED 3.5K d",
+            "source": "products.json",
+            "similarity": 0.764
+          },
+          {
+            "text": "Domestic Shipping — Overnight Shipping: Delivery in 1 business day. Cost: $24.99 USD.  P.O. Box allowed: No. Cut-off time: 12:00 PM EST. Must order before 12PM EST. Not available on Fridays for Saturd",
+            "source": "shipping_zones.json",
+            "similarity": 0.6759
+          },
+          {
+            "text": "International Shipping — Rest of World: Delivery in 14-21 business days. Cost: $39.99 USD. Carrier: DHL Express. Note: Customer responsible for all import duties and taxes.",
+            "source": "shipping_zones.json",
+            "similarity": 0.6446
+          }
+        ],
+        "correctness": 1.0,
+        "relevance": 1.0,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      },
+      "no_rag": {
+        "mode": "no_rag",
+        "response": "I'm sorry for any confusion, but as an AI, I don't have access to real-time data or the ability to calculate costs. I'm designed to provide information and answer questions based on pre-existing knowledge and data. If you have any specifics about the Dell XPS 15 laptop, I'd be happy to help calculate the cost.",
+        "latency_ms": 2582,
+        "tokens_used": 80,
+        "chunks_retrieved": 0,
+        "correctness": 0.0,
+        "relevance": 0.4,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      }
+    },
+    {
+      "id": "Q17",
+      "category": "Cross-domain",
+      "question": "If I order the Sony WH-1000XM5 headphones today with express shipping, when will they arrive?",
+      "ground_truth": "In 2 to 3 business days, assuming order placed before 2PM EST on a business day",
+      "requires_rag": true,
+      "hallucination_trap": false,
+      "rag": {
+        "mode": "rag",
+        "response": "I'm sorry, but as an AI, I don't have real-time capabilities to provide shipping information. I recommend checking the shipping zones file or contacting TechMart's customer service for the most accurate and up-to-date information.",
+        "latency_ms": 2808,
+        "tokens_used": 54,
+        "chunks_retrieved": 3,
+        "chunks": [
+          {
+            "text": "Domestic Shipping — Express Shipping: Delivery in 2-3 business days. Cost: $9.99 USD.  P.O. Box allowed: No. Cut-off time: 2:00 PM EST. Physical address required. Not available for all products.",
+            "source": "shipping_zones.json",
+            "similarity": 0.6651
+          },
+          {
+            "text": "Domestic Shipping — Overnight Shipping: Delivery in 1 business day. Cost: $24.99 USD.  P.O. Box allowed: No. Cut-off time: 12:00 PM EST. Must order before 12PM EST. Not available on Fridays for Saturd",
+            "source": "shipping_zones.json",
+            "similarity": 0.6327
+          },
+          {
+            "text": "International Shipping — Rest of World: Delivery in 14-21 business days. Cost: $39.99 USD. Carrier: DHL Express. Note: Customer responsible for all import duties and taxes.",
+            "source": "shipping_zones.json",
+            "similarity": 0.6313
+          }
+        ],
+        "correctness": 0.0,
+        "relevance": 0.1,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      },
+      "no_rag": {
+        "mode": "no_rag",
+        "response": "I'm sorry for any confusion, but as an AI, I don't have the ability to track the delivery of products. I can only provide information based on the data I was trained on. I recommend checking the Sony's official website or contacting them directly for the most accurate information.",
+        "latency_ms": 2582,
+        "tokens_used": 63,
+        "chunks_retrieved": 0,
+        "correctness": 0.0,
+        "relevance": 0.1,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      }
+    },
+    {
+      "id": "Q18",
+      "category": "Cross-domain",
+      "question": "Can I return the Samsung TV if I opened it but it arrived defective?",
+      "ground_truth": "Yes, defective items can be returned within 7 days of delivery regardless of opened condition, with free return shipping arranged",
+      "requires_rag": true,
+      "hallucination_trap": false,
+      "rag": {
+        "mode": "rag",
+        "response": "Yes, you can return the Samsung TV if it arrived defective. However, please note that the return process may vary depending on the manufacturer and the specific product. \n\nFor the Samsung TV, you should contact TechMart support within 7 days of receiving the product. They will arrange a free return and provide a full refund or replacement at no extra cost. Photos of the damage may be required for processing.\n\nThe order system or receipt number is required for all returns.\n\nPlease note that the return process may vary depending on the manufacturer and the specific product.",
+        "latency_ms": 3103,
+        "tokens_used": 119,
+        "chunks_retrieved": 3,
+        "chunks": [
+          {
+            "text": "Question: Can I return an opened product?\nAnswer: Yes, as long as it's within 30 days and the product is in resalable condition with all original accessories. Opened software and digital codes are not",
+            "source": "faqs.md",
+            "similarity": 0.7025
+          },
+          {
+            "text": "order systems cannot be returned unless defective.\n\n### Defective or Damaged Items\n- If an item arrives damaged or defective, contact us within **7 days** of delivery.\n- We will arrange a free return ",
+            "source": "policies.md",
+            "similarity": 0.6744
+          },
+          {
+            "text": "er number or receipt) is required for all returns.\n\n### Non-Returnable Items\n- Opened software licenses and digital download codes are **non-refundable**.\n- Items marked as **\"Final Sale\"** at time of",
+            "source": "policies.md",
+            "similarity": 0.6267
+          }
+        ],
+        "correctness": 0.5,
+        "relevance": 0.96,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      },
+      "no_rag": {
+        "mode": "no_rag",
+        "response": "I'm sorry, but as an AI, I don't have the ability to physically interact with devices or systems. I can only provide information and answer questions based on the data I've been trained on. I recommend contacting the manufacturer or the customer service of the Samsung TV for assistance.",
+        "latency_ms": 2672,
+        "tokens_used": 63,
+        "chunks_retrieved": 0,
+        "correctness": 0.0,
+        "relevance": 0.24,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      }
+    },
+    {
+      "id": "Q19",
+      "category": "Cross-domain",
+      "question": "What payment methods are accepted for international orders?",
+      "ground_truth": "Visa, Mastercard, American Express, Discover, PayPal, Apple Pay, Google Pay, TechMart Gift Cards, and Affirm",
+      "requires_rag": true,
+      "hallucination_trap": false,
+      "rag": {
+        "mode": "rag",
+        "response": "We accept Visa, Mastercard, American Express, Discover, PayPal, Apple Pay, Google Pay, TechMart Gift Cards, and Affirm (Buy Now Pay Later).",
+        "latency_ms": 2579,
+        "tokens_used": 40,
+        "chunks_retrieved": 3,
+        "chunks": [
+          {
+            "text": "Question: What payment methods do you accept?\nAnswer: We accept Visa, Mastercard, American Express, Discover, PayPal, Apple Pay, Google Pay, TechMart Gift Cards, and Affirm (Buy Now Pay Later).",
+            "source": "faqs.md",
+            "similarity": 0.7284
+          },
+          {
+            "text": "## Payment Policy\n\n### Accepted Payment Methods\n- Visa, Mastercard, American Express, Discover\n- PayPal and PayPal Credit\n- Apple Pay and Google Pay\n- TechMart Gift Cards and Store Credit\n- Affirm (Bu",
+            "source": "policies.md",
+            "similarity": 0.7044
+          },
+          {
+            "text": "pped internationally due to regional restrictions.\n\n### Order Tracking\n- A tracking number is emailed as soon as your order ships.\n- Track your order at any time via \"My Orders\" in your account or dir",
+            "source": "policies.md",
+            "similarity": 0.6647
+          }
+        ],
+        "correctness": 1.0,
+        "relevance": 0.0,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      },
+      "no_rag": {
+        "mode": "no_rag",
+        "response": "I'm sorry, but as an AI, I don't have access to real-time databases or the ability to process payments. I can only provide information based on the data I was trained on. Therefore, I can't provide the specifics about accepted payment methods for international orders. I recommend contacting your customer service or the relevant department for this information.",
+        "latency_ms": 2705,
+        "tokens_used": 77,
+        "chunks_retrieved": 0,
+        "correctness": 0.0,
+        "relevance": 1.0,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      }
+    },
+    {
+      "id": "Q20",
+      "category": "Cross-domain",
+      "question": "Which product has the best value considering price and warranty length?",
+      "ground_truth": "The ASUS ROG Monitor and Dell UltraSharp Monitor both offer 3 years warranty. The Dell XPS 15 offers 2 years warranty. The WD Passport SSD offers 3 years warranty at $129.99.",
+      "requires_rag": true,
+      "hallucination_trap": false,
+      "rag": {
+        "mode": "rag",
+        "response": "Based on the provided store information, the Apple MacBook Pro with the M3 Pro chip, 18GB unified memory, 512GB SSD, 14\" Liquid Retina XDR display, 18hr battery, and 1 year Apple limited warranty would have the best value considering price and warranty length.",
+        "latency_ms": 2903,
+        "tokens_used": 72,
+        "chunks_retrieved": 3,
+        "chunks": [
+          {
+            "text": "Product: Apple MacBook Pro 14\". Category: Laptops. Price: $1999.99 USD. SKU: APPLE-MBP14-M3PRO. Specifications: Apple M3 Pro chip, 18GB unified memory, 512GB SSD, 14\" Liquid Retina XDR display, 18hr b",
+            "source": "products.json",
+            "similarity": 0.668
+          },
+          {
+            "text": "Product: Logitech MX Master 3S Mouse. Category: Accessories. Price: $99.99 USD. SKU: LOGI-MXMASTER3S. Specifications: 8000 DPI sensor, MagSpeed electromagnetic scroll, Bluetooth + USB receiver, 70-day",
+            "source": "products.json",
+            "similarity": 0.664
+          },
+          {
+            "text": "Product: Sony WH-1000XM5 Headphones. Category: Audio. Price: $349.99 USD. SKU: SONY-WH1000XM5. Specifications: Industry-leading noise cancelling, 30hr battery, Bluetooth 5.2, LDAC, multipoint connecti",
+            "source": "products.json",
+            "similarity": 0.6632
+          }
+        ],
+        "correctness": 0.0,
+        "relevance": 0.9,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      },
+      "no_rag": {
+        "mode": "no_rag",
+        "response": "I'm sorry, but as an AI, I don't have the ability to browse the internet or access real-time databases to provide the best value products. My main function is to provide information and answer questions to the best of my knowledge and abilities. If you have any questions about specifics, feel free to ask!",
+        "latency_ms": 2684,
+        "tokens_used": 69,
+        "chunks_retrieved": 0,
+        "correctness": 0.0,
+        "relevance": 0.45,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      }
+    },
+    {
+      "id": "Q21",
+      "category": "Hallucination Trap",
+      "question": "What is the price of the iPhone 15 Pro at TechMart?",
+      "ground_truth": "The model should state it does not have this information. Apple iPhone 15 Pro is NOT listed in TechMart catalogue (only Samsung Galaxy S24 Ultra and Google Pixel 8 are listed as smartphones).",
+      "requires_rag": true,
+      "hallucination_trap": true,
+      "rag": {
+        "mode": "rag",
+        "response": "I'm sorry, but as an AI, I don't have real-time access to external databases or the internet to fetch current prices. Therefore, I can't provide the current price of the iPhone 15 Pro at TechMart. I recommend checking the website or contacting TechMart directly for the most accurate information.",
+        "latency_ms": 2857,
+        "tokens_used": 70,
+        "chunks_retrieved": 3,
+        "chunks": [
+          {
+            "text": "Product: Apple iPhone 15 Pro. Category: Smartphones. Price: $999.99 USD. SKU: APPLE-IP15PRO-256. Specifications: A17 Pro chip, 8GB RAM, 256GB storage, 48MP ProRAW camera, 6.1\" Super Retina XDR ProMoti",
+            "source": "products.json",
+            "similarity": 0.774
+          },
+          {
+            "text": "Product: Apple MacBook Pro 14\". Category: Laptops. Price: $1999.99 USD. SKU: APPLE-MBP14-M3PRO. Specifications: Apple M3 Pro chip, 18GB unified memory, 512GB SSD, 14\" Liquid Retina XDR display, 18hr b",
+            "source": "products.json",
+            "similarity": 0.679
+          },
+          {
+            "text": "Product: iPad Pro 12.9\" (M2). Category: Tablets. Price: $1099.99 USD. SKU: APPLE-IPADPRO129-M2. Specifications: Apple M2 chip, 12.9\" Liquid Retina XDR mini-LED, 256GB, Wi-Fi 6E, Thunderbolt 4, 12MP Pr",
+            "source": "products.json",
+            "similarity": 0.6442
+          }
+        ],
+        "correctness": 0.0,
+        "relevance": 0.9,
+        "hallucinated": false,
+        "hallucination_notes": "Correctly acknowledged"
+      },
+      "no_rag": {
+        "mode": "no_rag",
+        "response": "I'm sorry for any confusion, but as an AI, I don't have real-time access to current market prices or inventory data. I'm designed to provide information and answer questions based on pre-existing knowledge and data. I recommend checking TechMart's official website or contacting them directly for the most accurate and up-to-date information.",
+        "latency_ms": 2711,
+        "tokens_used": 78,
+        "chunks_retrieved": 0,
+        "correctness": 0.0,
+        "relevance": 0.6,
+        "hallucinated": false,
+        "hallucination_notes": "Correctly acknowledged"
+      }
+    },
+    {
+      "id": "Q22",
+      "category": "Hallucination Trap",
+      "question": "Do you offer same-day delivery?",
+      "ground_truth": "The model should say no, TechMart does not offer same-day delivery. Fastest option is Overnight (next business day).",
+      "requires_rag": true,
+      "hallucination_trap": true,
+      "rag": {
+        "mode": "rag",
+        "response": "Yes, I do offer same-day delivery.",
+        "latency_ms": 2529,
+        "tokens_used": 12,
+        "chunks_retrieved": 3,
+        "chunks": [
+          {
+            "text": "Overnight Shipping | Next business day | $24.99 |\n\n- Orders placed before **2:00 PM EST** on business days ship same day.\n- Orders placed after 2:00 PM or on weekends ship the next business day.\n- Fre",
+            "source": "policies.md",
+            "similarity": 0.6758
+          },
+          {
+            "text": "Domestic Shipping — Overnight Shipping: Delivery in 1 business day. Cost: $24.99 USD.  P.O. Box allowed: No. Cut-off time: 12:00 PM EST. Must order before 12PM EST. Not available on Fridays for Saturd",
+            "source": "shipping_zones.json",
+            "similarity": 0.6398
+          },
+          {
+            "text": "Question: Can I use multiple discount codes on one order?\nAnswer: Only one discount code can be applied per order. Gift cards can be combined with a discount code.\n\n---\n\n## Shipping & Delivery",
+            "source": "faqs.md",
+            "similarity": 0.6239
+          }
+        ],
+        "correctness": 0.5,
+        "relevance": 1.0,
+        "hallucinated": true,
+        "hallucination_notes": "Should say not available"
+      },
+      "no_rag": {
+        "mode": "no_rag",
+        "response": "I'm sorry for any confusion, but as an AI, I don't have the capability to provide real-time information or updates about specific products or services. I'm designed to provide assistance with information and answer questions based on pre-existing knowledge. I'm here to help with any questions you have about ShopBot, TechMart's products and services.",
+        "latency_ms": 2781,
+        "tokens_used": 79,
+        "chunks_retrieved": 0,
+        "correctness": 0.0,
+        "relevance": 0.0,
+        "hallucinated": false,
+        "hallucination_notes": "Correctly uncertain"
+      }
+    },
+    {
+      "id": "Q23",
+      "category": "Hallucination Trap",
+      "question": "What is TechMart's data privacy policy regarding selling customer data to advertisers?",
+      "ground_truth": "The model should state that customer data is never sold to third parties, based on the privacy section in policies.md",
+      "requires_rag": true,
+      "hallucination_trap": false,
+      "rag": {
+        "mode": "rag",
+        "response": "I'm sorry, but as an AI, I don't have access to any specific store information or policies. I can only provide information based on the data I was trained on. I can't provide a detailed answer about the privacy policy or data security practices of a specific store. I recommend reaching out to the store directly for accurate information.",
+        "latency_ms": 2811,
+        "tokens_used": 73,
+        "chunks_retrieved": 3,
+        "chunks": [
+          {
+            "text": "## Privacy & Data Policy\n\n- Customer data is never sold to third parties.\n- We collect only information necessary to process and deliver your order.\n- You may request deletion of your account and data",
+            "source": "policies.md",
+            "similarity": 0.8858
+          },
+          {
+            "text": "# TechMart Store Policies",
+            "source": "policies.md",
+            "similarity": 0.7317
+          },
+          {
+            "text": "Question: Are your products genuine/authentic?\nAnswer: 100%. TechMart is an authorised retailer for all brands we carry. All products come with full manufacturer warranty and documentation.\n\n---\n\n## P",
+            "source": "faqs.md",
+            "similarity": 0.6485
+          }
+        ],
+        "correctness": 0.5,
+        "relevance": 0.48,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      },
+      "no_rag": {
+        "mode": "no_rag",
+        "response": "I'm sorry, but as an AI, I don't have access to real-time data or the ability to browse the internet in real-time. Therefore, I can't provide the current data privacy policy of TechMart. However, I can tell you that generally, data privacy is a crucial aspect of any business, and it's important to ensure that all customers' data is protected. This includes sensitive information like personal identifiers, shopping data, and more. For more detailed information, you should refer to the latest data privacy policies of your specific business.",
+        "latency_ms": 3079,
+        "tokens_used": 119,
+        "chunks_retrieved": 0,
+        "correctness": 0.5,
+        "relevance": 0.72,
+        "hallucinated": false,
+        "hallucination_notes": "Standard factual question"
+      }
+    },
+    {
+      "id": "Q24",
+      "category": "Hallucination Trap",
+      "question": "Can I get a bulk discount if I buy 5 laptops?",
+      "ground_truth": "The model should say it does not have information about bulk discounts in its knowledge base and suggest contacting support",
+      "requires_rag": true,
+      "hallucination_trap": true,
+      "rag": {
+        "mode": "rag",
+        "response": "Sure, you can get a bulk discount if you buy 5 laptops. However, you can only use one discount code per order. If you want to use a discount code, you should create a new order with the discount code.",
+        "latency_ms": 2718,
+        "tokens_used": 51,
+        "chunks_retrieved": 3,
+        "chunks": [
+          {
+            "text": "Question: Can I use multiple discount codes on one order?\nAnswer: Only one discount code can be applied per order. Gift cards can be combined with a discount code.\n\n---\n\n## Shipping & Delivery",
+            "source": "faqs.md",
+            "similarity": 0.5926
+          },
+          {
+            "text": "Product: Lenovo ThinkPad E15. Category: Laptops. Price: $849.99 USD. SKU: LENOVO-TPE15-I5. Specifications: Intel Core i5-1235U, 8GB DDR4 RAM, 256GB SSD, 15.6\" FHD IPS display, fingerprint reader. Warr",
+            "source": "products.json",
+            "similarity": 0.5792
+          },
+          {
+            "text": "Product: Dell XPS 15 Laptop. Category: Laptops. Price: $1499.99 USD. SKU: DELL-XPS15-13700H. Specifications: Intel Core i7-13700H, 16GB DDR5 RAM, 512GB NVMe SSD, NVIDIA RTX 4060 8GB, 15.6\" OLED 3.5K d",
+            "source": "products.json",
+            "similarity": 0.5639
+          }
+        ],
+        "correctness": 0.0,
+        "relevance": 1.0,
+        "hallucinated": true,
+        "hallucination_notes": "Should say not available"
+      },
+      "no_rag": {
+        "mode": "no_rag",
+        "response": "I'm sorry for any confusion, but as an AI, I don't have access to real-time data or the ability to process personal data unless it's shared with me in the course of our conversation. I am designed to respect user privacy and confidentiality. Therefore, I can't provide you with a bulk discount if you buy 5 laptops. I suggest you to check the specifics of the laptop you're purchasing or contact your local store directly for the best possible deal.",
+        "latency_ms": 2917,
+        "tokens_used": 106,
+        "chunks_retrieved": 0,
+        "correctness": 0.0,
+        "relevance": 1.0,
+        "hallucinated": false,
+        "hallucination_notes": "Correctly uncertain"
+      }
+    },
+    {
+      "id": "Q25",
+      "category": "Hallucination Trap",
+      "question": "What happened to my order number 12345? Can you check the status?",
+      "ground_truth": "The model should clarify it cannot access real-time order data and direct the user to My Orders in their account or customer support",
+      "requires_rag": false,
+      "hallucination_trap": true,
+      "rag": {
+        "mode": "rag",
+        "response": "I'm sorry, but as an AI, I don't have the ability to track orders or access customer accounts. I can only provide information based on the data I was trained on. If you have any questions about tracking an order, you should contact your customer service or the support team of the store.",
+        "latency_ms": 2964,
+        "tokens_used": 65,
+        "chunks_retrieved": 3,
+        "chunks": [
+          {
+            "text": "Question: How do I track my order?\nAnswer: Once your order ships, you'll receive a tracking number via email. You can also log into your account and go to \"My Orders\" to see real-time tracking.",
+            "source": "faqs.md",
+            "similarity": 0.6587
+          },
+          {
+            "text": "pped internationally due to regional restrictions.\n\n### Order Tracking\n- A tracking number is emailed as soon as your order ships.\n- Track your order at any time via \"My Orders\" in your account or dir",
+            "source": "policies.md",
+            "similarity": 0.6363
+          },
+          {
+            "text": "Question: Can I modify or cancel my order after placing it?\nAnswer: Orders can be modified or cancelled within 1 hour of placement. After that, the order enters processing and cannot be changed. Conta",
+            "source": "faqs.md",
+            "similarity": 0.6096
+          }
+        ],
+        "correctness": 0.5,
+        "relevance": 0.17,
+        "hallucinated": false,
+        "hallucination_notes": "Correctly deferred"
+      },
+      "no_rag": {
+        "mode": "no_rag",
+        "response": "I'm sorry for any confusion, but as an AI, I don't have the ability to track or check the status of orders. I'm designed to provide assistance with questions related to tech support and programming. If you have any questions related to these topics, feel free to ask.",
+        "latency_ms": 2600,
+        "tokens_used": 62,
+        "chunks_retrieved": 0,
+        "correctness": 0.0,
+        "relevance": 0.51,
+        "hallucinated": false,
+        "hallucination_notes": "Correctly deferred"
+      }
+    }
+  ]
+}

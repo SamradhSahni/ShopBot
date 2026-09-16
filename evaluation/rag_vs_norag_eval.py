@@ -1,4 +1,4 @@
-﻿"""
+"""
 rag_vs_norag_eval.py — RAG vs No-RAG Evaluation
 =================================================
 Evaluates ShopBot on all 25 questions in TWO modes:
@@ -21,7 +21,7 @@ EVAL_DIR       = os.path.dirname(os.path.abspath(__file__))
 SHOPBOT_ROOT   = os.path.join(EVAL_DIR, "..")
 QUESTIONS_PATH = os.path.join(EVAL_DIR, "questions.json")
 RESULTS_DIR    = os.path.join(EVAL_DIR, "results")
-CHROMA_PATH    = os.path.join(SHOPBOT_ROOT, "ex3_rag", "chroma_db")
+CHROMA_PATH    = os.path.join(SHOPBOT_ROOT, "ex2_knowledge_base", "chroma_db")
 OLLAMA_URL     = os.getenv("OLLAMA_URL", "http://localhost:11434")
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
