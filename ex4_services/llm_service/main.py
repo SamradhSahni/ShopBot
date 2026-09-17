@@ -84,6 +84,21 @@ def generate(request: GenerateRequest):
     else:
         final_prompt = request.prompt
 
+    # Per-model token cap — code models (starcoder, deepseek-coder) run forever
+    # without a cap on open-ended chat questions, causing ReadTimeout in the UI.
+    # If caller passes max_tokens > 0, use that. Otherwise use a sensible per-model default.
+    if request.max_tokens and request.max_tokens > 0:
+        num_predict = request.max_tokens
+    else:
+        # Code models need a cap — they don't know when to stop for chat prompts
+        model_lower = model.lower()
+        if "codellama" in model_lower:
+            num_predict = 768    # CodeLlama handles chat better, allow longer
+        elif "starcoder" in model_lower or "deepseek" in model_lower:
+            num_predict = 512    # Code models cap at 512 for chat use-case
+        else:
+            num_predict = 512    # Safe default for any other model
+
     payload = {
         "model": model,
         "prompt": final_prompt,
@@ -91,9 +106,10 @@ def generate(request: GenerateRequest):
         "stream": False,
         "options": {
             "temperature": request.temperature,
-            "num_predict": request.max_tokens if request.max_tokens and request.max_tokens > 0 else -1,  # -1 = unlimited
+            "num_predict": num_predict,
             "num_ctx": 4096,   # Full context window for detailed responses
             "num_thread": 4,   # 4 threads out of 6 vCPUs — fast without hogging the desktop
+            "stop": ["\n\n\n", "Human:", "Customer:", "User:"],  # Stop on double-newline to avoid rambling
         }
     }
 

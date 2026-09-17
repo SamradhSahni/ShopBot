@@ -18,7 +18,7 @@ RAG_SERVICE_URL  = os.getenv("RAG_SERVICE_URL",  "http://localhost:8001")
 LLM_SERVICE_URL  = os.getenv("LLM_SERVICE_URL",  "http://localhost:8002")
 DATA_SERVICE_URL = os.getenv("DATA_SERVICE_URL", "http://localhost:8003")
 
-TIMEOUT = httpx.Timeout(120.0)
+TIMEOUT = httpx.Timeout(300.0)
 
 
 class ChatRequest(BaseModel):
