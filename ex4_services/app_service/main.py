@@ -103,6 +103,10 @@ async def chat(request: ChatRequest):
                 rag_ms = int((time.time() - t0) * 1000)
                 rag_data = rag_resp.json()
                 context = rag_data.get("context", "")
+                # Strip [Source: x | Type: y] labels — code models mistake these
+                # for file paths they need to access, causing "I'm sorry" prefixes
+                import re as _re
+                context = _re.sub(r'\[Source:[^\]]+\]\n?', '', context).strip()
                 chunks = rag_data.get("chunks", [])
                 trace["steps"].append({
                     "step": 1, "service": "rag-service", "action": "retrieve",
