@@ -35,6 +35,15 @@ TechMart Store Data:
 Customer: {question}
 ShopBot:"""
 
+NORAG_PROMPT_TEMPLATE = """You are ShopBot, TechMart's helpful customer support assistant.
+Answer the customer's question based on your general knowledge of electronics retail and e-commerce.
+Be friendly, helpful, and give your best answer even without store-specific data.
+If you genuinely cannot help, suggest the customer contact TechMart support.
+Do NOT say 'I don't have access to real-time data' or 'I'm an AI' — just answer helpfully.
+
+Customer: {question}
+ShopBot:"""
+
 
 class GenerateRequest(BaseModel):
     prompt: str
@@ -84,7 +93,9 @@ def generate(request: GenerateRequest):
             question=request.question
         )
     else:
-        final_prompt = request.prompt
+        # No RAG context — use a structured no-RAG prompt so code models give helpful answers
+        question = request.question or request.prompt
+        final_prompt = NORAG_PROMPT_TEMPLATE.format(question=question)
 
     # Per-model token cap — code models (starcoder, deepseek-coder) run forever
     # without a cap on open-ended chat questions, causing ReadTimeout in the UI.
