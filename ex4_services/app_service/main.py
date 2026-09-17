@@ -39,12 +39,23 @@ class ChatResponse(BaseModel):
 
 
 HTML_PATH = os.path.join(os.path.dirname(__file__), "index.html")
+DASHBOARD_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "evaluation", "model_comparison_dashboard.html")
 
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_ui():
     with open(HTML_PATH, "r", encoding="utf-8") as f:
         return HTMLResponse(content=f.read())
+
+
+@app.get("/dashboard", response_class=HTMLResponse)
+async def serve_dashboard():
+    """Serve the SE Model Comparison Dashboard at /dashboard."""
+    try:
+        with open(DASHBOARD_PATH, "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    except FileNotFoundError:
+        return HTMLResponse(content="<h2>Dashboard not found. Run evaluation first.</h2>", status_code=404)
 
 
 @app.get("/health")
