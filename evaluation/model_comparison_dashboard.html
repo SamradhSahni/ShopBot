@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>ShopBot SE Model Comparison — 7 Category Analysis</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+  :root{
+    --bg:#0a0d14;--surface:#111827;--surface2:#1a2235;--surface3:#1f2d44;
+    --border:#2a3a54;--text:#e2e8f0;--muted:#94a3b8;--accent:#6366f1;
+    --codellama:#818cf8;--starcoder:#f472b6;--deepseek:#34d399;
+    --gold:#fbbf24;--green:#10b981;--red:#f87171;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+  /* ─── Hero ─── */
+  .hero{
+    background:linear-gradient(135deg,#0f1629 0%,#1a1040 50%,#0d1f2d 100%);
+    padding:60px 40px 50px;text-align:center;position:relative;overflow:hidden;
+    border-bottom:1px solid var(--border);
+  }
+  .hero::before{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse 80% 60% at 50% -20%,rgba(99,102,241,0.15),transparent);
+  }
+  .hero-badge{
+    display:inline-block;padding:4px 14px;border-radius:999px;
+    background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);
+    font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);
+    margin-bottom:20px;font-weight:600;
+  }
+  .hero h1{font-size:clamp(28px,5vw,52px);font-weight:800;line-height:1.15;
+    background:linear-gradient(135deg,#a5b4fc,#6366f1,#34d399);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px}
+  .hero p{font-size:16px;color:var(--muted);max-width:640px;margin:0 auto 32px}
+  .hero-stats{display:flex;justify-content:center;gap:40px;flex-wrap:wrap}
+  .hero-stat{text-align:center}
+  .hero-stat .num{font-size:32px;font-weight:800;color:var(--accent)}
+  .hero-stat .lbl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+
+  /* ─── Layout ─── */
+  .container{max-width:1300px;margin:0 auto;padding:40px 24px}
+  .section-title{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;
+    letter-spacing:2px;margin-bottom:24px;display:flex;align-items:center;gap:10px}
+  .section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+  /* ─── Model Cards ─── */
+  .model-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-bottom:48px}
+  .model-card{
+    background:var(--surface);border:1px solid var(--border);border-radius:16px;
+    padding:28px;position:relative;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s;
+  }
+  .model-card:hover{transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,0,0,0.4)}
+  .model-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+  .model-card.codellama::before{background:linear-gradient(90deg,#6366f1,#818cf8)}
+  .model-card.deepseek::before{background:linear-gradient(90deg,#10b981,#34d399)}
+  .model-card.starcoder::before{background:linear-gradient(90deg,#ec4899,#f472b6)}
+  .model-card .model-name{font-size:18px;font-weight:700;margin-bottom:4px}
+  .model-card .model-type{font-size:12px;color:var(--muted);margin-bottom:20px}
+  .model-card .score-row{display:flex;justify-content:space-between;align-items:center;
+    padding:8px 0;border-bottom:1px solid var(--border);font-size:14px}
+  .model-card .score-row:last-child{border-bottom:none}
+  .model-card .score-val{font-weight:700;font-family:'JetBrains Mono',monospace}
+  .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:600}
+  .badge.winner{background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.3)}
+  .badge.loser{background:rgba(248,113,113,0.1);color:#f87171;border:1px solid rgba(248,113,113,0.2)}
+  .badge.neutral{background:rgba(148,163,184,0.1);color:#94a3b8;border:1px solid rgba(148,163,184,0.2)}
+
+  /* ─── Charts ─── */
+  .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:48px}
+  .charts-grid.triple{grid-template-columns:1fr 1fr 1fr}
+  .chart-card{
+    background:var(--surface);border:1px solid var(--border);border-radius:16px;
+    padding:28px;transition:box-shadow 0.2s;
+  }
+  .chart-card:hover{box-shadow:0 8px 40px rgba(0,0,0,0.3)}
+  .chart-card.wide{grid-column:1/-1}
+  .chart-title{font-size:15px;font-weight:700;margin-bottom:4px;color:var(--text)}
+  .chart-sub{font-size:12px;color:var(--muted);margin-bottom:24px}
+  .chart-wrap{position:relative;height:280px}
+  .chart-wrap.tall{height:360px}
+  .chart-wrap.sm{height:220px}
+
+  /* ─── Legend ─── */
+  .legend{display:flex;gap:20px;justify-content:center;margin-top:20px;flex-wrap:wrap}
+  .legend-item{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500}
+  .legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+
+  /* ─── Category Breakdown ─── */
+  .cat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;margin-bottom:48px}
+  .cat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+  .cat-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+  .cat-name{font-size:14px;font-weight:700}
+  .cat-winner{font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px}
+  .bar-group{margin-bottom:10px}
+  .bar-label{font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;justify-content:space-between}
+  .bar-track{height:8px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:999px;transition:width 1.2s cubic-bezier(.23,1,.32,1)}
+
+  /* ─── Key findings ─── */
+  .findings{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:48px}
+  .finding{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center}
+  .finding .icon{font-size:28px;margin-bottom:10px}
+  .finding .q{font-size:12px;color:var(--muted);margin-bottom:6px}
+  .finding .a{font-size:15px;font-weight:700;color:var(--text)}
+  .finding .a span{color:var(--accent)}
+
+  /* ─── Animations ─── */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  .fade-up{animation:fadeUp 0.6s ease forwards}
+
+  /* ─── Footer ─── */
+  footer{text-align:center;padding:40px;color:var(--muted);font-size:13px;border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-badge">Software Engineering LLM Evaluation</div>
+  <h1>ShopBot Model<br>Comparison Report</h1>
+  <p>Category-wise quantitative comparison of 3 LLMs across 7 software engineering task types, 35 questions, 6 metrics.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="num">3</div><div class="lbl">Models</div></div>
+    <div class="hero-stat"><div class="num">35</div><div class="lbl">Questions</div></div>
+    <div class="hero-stat"><div class="num">7</div><div class="lbl">Categories</div></div>
+    <div class="hero-stat"><div class="num">6</div><div class="lbl">Metrics</div></div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- Model Summary Cards -->
+<div class="section-title">Model Overview</div>
+<div class="model-cards">
+
+  <div class="model-card codellama fade-up">
+    <div class="model-name" style="color:#818cf8">CodeLlama 7B</div>
+    <div class="model-type">Meta — General instruction + code model</div>
+    <div class="score-row"><span>Overall Correctness</span><span class="score-val" style="color:#818cf8">0.500</span></div>
+    <div class="score-row"><span>Best Category</span><span class="score-val">Code Gen / RAG (0.7 / 0.6)</span></div>
+    <div class="score-row"><span>Code Test-Pass Rate</span><span class="score-val" style="color:#34d399">80%</span></div>
+    <div class="score-row"><span>Avg Latency</span><span class="score-val" style="color:#f87171">31,306 ms</span></div>
+    <div class="score-row"><span>Hallucination Rate</span><span class="score-val" style="color:#34d399">0%</span></div>
+    <div style="margin-top:14px"><span class="badge winner">✓ Best RAG + Code Retrieval</span></div>
+  </div>
+
+  <div class="model-card deepseek fade-up" style="animation-delay:0.1s">
+    <div class="model-name" style="color:#34d399">DeepSeek-Coder 6.7B</div>
+    <div class="model-type">DeepSeek — Code-specialized instruction model</div>
+    <div class="score-row"><span>Overall Correctness</span><span class="score-val" style="color:#34d399">0.500</span></div>
+    <div class="score-row"><span>Best Category</span><span class="score-val">Explanation / Dep. (0.6 / 0.6)</span></div>
+    <div class="score-row"><span>Code Test-Pass Rate</span><span class="score-val" style="color:#fbbf24">60%</span></div>
+    <div class="score-row"><span>Avg Latency</span><span class="score-val" style="color:#34d399">5,239 ms</span></div>
+    <div class="score-row"><span>Hallucination Rate</span><span class="score-val" style="color:#34d399">0%</span></div>
+    <div style="margin-top:14px"><span class="badge winner">✓ 6× Faster · Best Explanation</span></div>
+  </div>
+
+  <div class="model-card starcoder fade-up" style="animation-delay:0.2s">
+    <div class="model-name" style="color:#f472b6">StarCoder2 7B</div>
+    <div class="model-type">HuggingFace — Code completion model (not instruct)</div>
+    <div class="score-row"><span>Overall Correctness</span><span class="score-val" style="color:#f87171">0.000</span></div>
+    <div class="score-row"><span>Best Category</span><span class="score-val">None</span></div>
+    <div class="score-row"><span>Code Test-Pass Rate</span><span class="score-val" style="color:#f87171">0%</span></div>
+    <div class="score-row"><span>Avg Latency</span><span class="score-val">0 ms (all failed)</span></div>
+    <div class="score-row"><span>Hallucination Rate</span><span class="score-val">N/A</span></div>
+    <div style="margin-top:14px"><span class="badge loser">✗ Rejects chat-style prompts</span></div>
+  </div>
+
+</div>
+
+<!-- KEY FINDINGS -->
+<div class="section-title">Key Findings by Category</div>
+<div class="findings">
+  <div class="finding"><div class="icon">📖</div><div class="q">Best for Explanation</div><div class="a"><span>DeepSeek-Coder</span><br>0.600 correctness</div></div>
+  <div class="finding"><div class="icon">🔍</div><div class="q">Best for Code Retrieval</div><div class="a"><span>CodeLlama</span><br>0.400 correctness</div></div>
+  <div class="finding"><div class="icon">🔗</div><div class="q">Best for Dependency Understanding</div><div class="a"><span>DeepSeek-Coder</span><br>0.600 correctness</div></div>
+  <div class="finding"><div class="icon">🐛</div><div class="q">Best for Bug Analysis</div><div class="a"><span>DeepSeek-Coder</span><br>0.500 correctness</div></div>
+  <div class="finding"><div class="icon">⚡</div><div class="q">Best for Code Generation</div><div class="a"><span>CodeLlama</span><br>80% test-pass rate</div></div>
+  <div class="finding"><div class="icon">♻️</div><div class="q">Best for Refactoring</div><div class="a"><span>Tied</span><br>0.400 each</div></div>
+  <div class="finding"><div class="icon">🗄️</div><div class="q">Best for RAG Questions</div><div class="a"><span>CodeLlama</span><br>0.600 correctness</div></div>
+</div>
+
+<!-- CHARTS ROW 1 -->
+<div class="section-title">Correctness Across All 7 Categories</div>
+<div class="charts-grid" style="margin-bottom:32px">
+
+  <div class="chart-card wide">
+    <div class="chart-title">Category-wise Correctness Score</div>
+    <div class="chart-sub">Average correctness (0.0–1.0) per category — higher is better</div>
+    <div class="chart-wrap tall"><canvas id="barCorrectness"></canvas></div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#818cf8"></div>CodeLlama</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#34d399"></div>DeepSeek-Coder</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f472b6"></div>StarCoder</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- CHARTS ROW 2 -->
+<div class="charts-grid" style="margin-bottom:32px">
+
+  <div class="chart-card">
+    <div class="chart-title">Radar — Overall Profile</div>
+    <div class="chart-sub">Correctness per category (CodeLlama vs DeepSeek-Coder)</div>
+    <div class="chart-wrap tall"><canvas id="radarChart"></canvas></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Relevance Score by Category</div>
+    <div class="chart-sub">How topically relevant were the responses?</div>
+    <div class="chart-wrap tall"><canvas id="barRelevance"></canvas></div>
+  </div>
+
+</div>
+
+<!-- CHARTS ROW 3 -->
+<div class="charts-grid triple" style="margin-bottom:32px">
+
+  <div class="chart-card">
+    <div class="chart-title">Avg Response Latency (ms)</div>
+    <div class="chart-sub">Lower is better — StarCoder excluded (all failed)</div>
+    <div class="chart-wrap"><canvas id="barLatency"></canvas></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Code Test-Pass Rate</div>
+    <div class="chart-sub">Code Generation category only — actually executed &amp; tested</div>
+    <div class="chart-wrap"><canvas id="doughnutCTP"></canvas></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Retrieval Quality by Category</div>
+    <div class="chart-sub">Did RAG retrieve the correct source document?</div>
+    <div class="chart-wrap"><canvas id="barRQ"></canvas></div>
+  </div>
+
+</div>
+
+<!-- CATEGORY MINI BARS -->
+<div class="section-title">Per-Category Breakdown</div>
+<div class="cat-grid">
+
+  <div class="cat-card">
+    <div class="cat-header"><span class="cat-name">📖 Explanation</span><span class="cat-winner badge winner">Winner: DeepSeek-Coder</span></div>
+    <div class="bar-group"><div class="bar-label"><span>CodeLlama</span><span>0.500</span></div><div class="bar-track"><div class="bar-fill" style="width:50%;background:linear-gradient(90deg,#6366f1,#818cf8)"></div></div></div>
+    <div class="bar-group"><div class="bar-label"><span>DeepSeek-Coder</span><span>0.600</span></div><div class="bar-track"><div class="bar-fill" style="width:60%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div></div>
+    <div class="bar-group"><div class="bar-label"><span>StarCoder</span><span>0.000</span></div><div class="bar-track"><div class="bar-fill" style="width:1%;background:#f472b6"></div></div></div>
+  </div>
+
+  <div class="cat-card">
+    <div class="cat-header"><span class="cat-name">🔍 Code Retrieval</span><span class="cat-winner badge winner">Winner: CodeLlama</span></div>
+    <div class="bar-group"><div class="bar-label"><span>CodeLlama</span><span>0.400</span></div><div class="bar-track"><div class="bar-fill" style="width:40%;background:linear-gradient(90deg,#6366f1,#818cf8)"></div></div></div>
+    <div class="bar-group"><div class="bar-label"><span>DeepSeek-Coder</span><span>0.300</span></div><div class="bar-track"><div class="bar-fill" style="width:30%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div></div>
+    <div class="bar-group"><div class="bar-label"><span>StarCoder</span><span>0.000</span></div><div class="bar-track"><div class="bar-fill" style="width:1%;background:#f472b6"></div></div></div>
+  </div>
+
+  <div class="cat-card">
+    <div class="cat-header"><span class="cat-name">🔗 Dependency Understanding</span><span class="cat-winner badge winner">Winner: DeepSeek-Coder</span></div>
+    <div class="bar-group"><div class="bar-label"><span>CodeLlama</span><span>0.500</span></div><div class="bar-track"><div class="bar-fill" style="width:50%;background:linear-gradient(90deg,#6366f1,#818cf8)"></div></div></div>
+    <div class="bar-group"><div class="bar-label"><span>DeepSeek-Coder</span><span>0.600</span></div><div class="bar-track"><div class="bar-fill" style="width:60%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div></div>
+    <div class="bar-group"><div class="bar-label"><span>StarCoder</span><span>0.000</span></div><div class="bar-track"><div class="bar-fill" style="width:1%;background:#f472b6"></div></div></div>
+  </div>
+
+  <div class="cat-card">
+    <div class="cat-header"><span class="cat-name">🐛 Bug Analysis</span><span class="cat-winner badge winner">Winner: DeepSeek-Coder</span></div>
+    <div class="bar-group"><div class="bar-label"><span>CodeLlama</span><span>0.400</span></div><div class="bar-track"><div class="bar-fill" style="width:40%;background:linear-gradient(90deg,#6366f1,#818cf8)"></div></div></div>
+    <div class="bar-group"><div class="bar-label"><span>DeepSeek-Coder</span><span>0.500</span></div><div class="bar-track"><div class="bar-fill" style="width:50%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div></div>
+    <div class="bar-group"><div class="bar-label"><span>StarCoder</span><span>0.000</span></div><div class="bar-track"><div class="bar-fill" style="width:1%;background:#f472b6"></div></div></div>
+  </div>
+
+  <div class="cat-card">
+    <div class="cat-header"><span class="cat-name">⚡ Code Generation</span><span class="cat-winner badge winner">Winner: CodeLlama (CTP)</span></div>
+    <div class="bar-group"><div class="bar-label"><span>CodeLlama (CTP 80%)</span><span>0.700</span></div><div class="bar-track"><div class="bar-fill" style="width:70%;background:linear-gradient(90deg,#6366f1,#818cf8)"></div></div></div>
+    <div class="bar-group"><div class="bar-label"><span>DeepSeek-Coder (CTP 60%)</span><span>0.700</span></div><div class="bar-track"><div class="bar-fill" style="width:70%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div></div>
+    <div class="bar-group"><div class="bar-label"><span>StarCoder (CTP 0%)</span><span>0.000</span></div><div class="bar-track"><div class="bar-fill" style="width:1%;background:#f472b6"></div></div></div>
+  </div>
+
+  <div class="cat-card">
+    <div class="cat-header"><span class="cat-name">♻️ Refactoring</span><span class="cat-winner badge neutral">Tied 0.400</span></div>
+    <div class="bar-group"><div class="bar-label"><span>CodeLlama</span><span>0.400</span></div><div class="bar-track"><div class="bar-fill" style="width:40%;background:linear-gradient(90deg,#6366f1,#818cf8)"></div></div></div>
+    <div class="bar-group"><div class="bar-label"><span>DeepSeek-Coder</span><span>0.400</span></div><div class="bar-track"><div class="bar-fill" style="width:40%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div></div>
+    <div class="bar-group"><div class="bar-label"><span>StarCoder</span><span>0.000</span></div><div class="bar-track"><div class="bar-fill" style="width:1%;background:#f472b6"></div></div></div>
+  </div>
+
+  <div class="cat-card">
+    <div class="cat-header"><span class="cat-name">🗄️ RAG-based Question</span><span class="cat-winner badge winner">Winner: CodeLlama</span></div>
+    <div class="bar-group"><div class="bar-label"><span>CodeLlama</span><span>0.600</span></div><div class="bar-track"><div class="bar-fill" style="width:60%;background:linear-gradient(90deg,#6366f1,#818cf8)"></div></div></div>
+    <div class="bar-group"><div class="bar-label"><span>DeepSeek-Coder</span><span>0.400</span></div><div class="bar-track"><div class="bar-fill" style="width:40%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div></div>
+    <div class="bar-group"><div class="bar-label"><span>StarCoder</span><span>0.000</span></div><div class="bar-track"><div class="bar-fill" style="width:1%;background:#f472b6"></div></div></div>
+  </div>
+
+</div>
+
+</div><!-- /container -->
+
+<footer>ShopBot SE Category-Wise Evaluation &bull; 35 Questions &bull; 7 Categories &bull; 3 Models &bull; Generated 2026-09-17</footer>
+
+<script>
+const CATS = ['Explanation','Code Retrieval','Dep. Understanding','Bug Analysis','Code Generation','Refactoring','RAG-based Q'];
+
+Chart.defaults.color = '#94a3b8';
+Chart.defaults.borderColor = '#2a3a54';
+Chart.defaults.font.family = 'Inter';
+
+const gridLine = { color: 'rgba(42,58,84,0.6)' };
+
+// 1 ── Grouped Bar: Correctness
+new Chart(document.getElementById('barCorrectness'), {
+  type: 'bar',
+  data: {
+    labels: CATS,
+    datasets: [
+      { label: 'CodeLlama',      data: [0.500,0.400,0.500,0.400,0.700,0.400,0.600], backgroundColor: 'rgba(129,140,248,0.85)', borderRadius: 6, borderSkipped: false },
+      { label: 'DeepSeek-Coder', data: [0.600,0.300,0.600,0.500,0.700,0.400,0.400], backgroundColor: 'rgba(52,211,153,0.85)',  borderRadius: 6, borderSkipped: false },
+      { label: 'StarCoder',      data: [0,0,0,0,0,0,0],                              backgroundColor: 'rgba(244,114,182,0.5)', borderRadius: 6, borderSkipped: false },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.raw.toFixed(3)}` } } },
+    scales: {
+      x: { grid: gridLine, ticks: { font: { size: 12 } } },
+      y: { grid: gridLine, min: 0, max: 1, ticks: { font: { size: 12 }, callback: v => v.toFixed(1) }, title: { display: true, text: 'Correctness Score', color: '#64748b' } }
+    }
+  }
+});
+
+// 2 ── Radar
+new Chart(document.getElementById('radarChart'), {
+  type: 'radar',
+  data: {
+    labels: CATS,
+    datasets: [
+      { label: 'CodeLlama',      data: [0.500,0.400,0.500,0.400,0.700,0.400,0.600],
+        borderColor: '#818cf8', backgroundColor: 'rgba(129,140,248,0.12)', pointBackgroundColor: '#818cf8', borderWidth: 2, pointRadius: 4 },
+      { label: 'DeepSeek-Coder', data: [0.600,0.300,0.600,0.500,0.700,0.400,0.400],
+        borderColor: '#34d399', backgroundColor: 'rgba(52,211,153,0.12)',  pointBackgroundColor: '#34d399', borderWidth: 2, pointRadius: 4 },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { padding: 16, font: { size: 12 } } } },
+    scales: { r: { min: 0, max: 0.8, ticks: { stepSize: 0.2, font: { size: 10 }, backdropColor: 'transparent' }, grid: gridLine, pointLabels: { font: { size: 11 }, color: '#94a3b8' } } }
+  }
+});
+
+// 3 ── Relevance Bar
+new Chart(document.getElementById('barRelevance'), {
+  type: 'bar',
+  data: {
+    labels: CATS,
+    datasets: [
+      { label: 'CodeLlama',      data: [0.630,0.750,0.968,0.790,0.960,0.910,0.984], backgroundColor: 'rgba(129,140,248,0.8)', borderRadius: 5, borderSkipped: false },
+      { label: 'DeepSeek-Coder', data: [0.582,0.922,0.898,0.918,0.846,0.838,0.860], backgroundColor: 'rgba(52,211,153,0.8)',  borderRadius: 5, borderSkipped: false },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { padding: 16, font: { size: 11 } } } },
+    scales: {
+      x: { grid: gridLine, ticks: { font: { size: 10 } } },
+      y: { grid: gridLine, min: 0, max: 1, ticks: { font: { size: 11 }, callback: v => v.toFixed(1) } }
+    }
+  }
+});
+
+// 4 ── Latency Bar (horizontal)
+new Chart(document.getElementById('barLatency'), {
+  type: 'bar',
+  data: {
+    labels: CATS,
+    datasets: [
+      { label: 'CodeLlama (ms)',      data: [26544,16481,32441,33780,23925,46882,39086], backgroundColor: 'rgba(129,140,248,0.8)', borderRadius: 5, borderSkipped: false },
+      { label: 'DeepSeek-Coder (ms)', data: [7666,3606,5890,5681,3939,5955,3936],       backgroundColor: 'rgba(52,211,153,0.8)',  borderRadius: 5, borderSkipped: false },
+    ]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { padding: 12, font: { size: 10 } } }, tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.raw.toLocaleString()}ms` } } },
+    scales: { x: { grid: gridLine, ticks: { callback: v => (v/1000).toFixed(0)+'s', font: { size: 10 } } }, y: { grid: gridLine, ticks: { font: { size: 9 } } } }
+  }
+});
+
+// 5 ── Code Test-Pass Doughnut
+new Chart(document.getElementById('doughnutCTP'), {
+  type: 'doughnut',
+  data: {
+    labels: ['CodeLlama (80%)', 'DeepSeek-Coder (60%)', 'StarCoder (0%)'],
+    datasets: [{
+      data: [80, 60, 0.1],
+      backgroundColor: ['rgba(129,140,248,0.9)','rgba(52,211,153,0.9)','rgba(244,114,182,0.4)'],
+      borderColor: ['#818cf8','#34d399','#f472b6'],
+      borderWidth: 2, hoverOffset: 8,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, cutout: '62%',
+    plugins: {
+      legend: { position: 'bottom', labels: { padding: 16, font: { size: 12 } } },
+      tooltip: { callbacks: { label: ctx => ` ${ctx.label}` } }
+    }
+  }
+});
+
+// 6 ── Retrieval Quality
+new Chart(document.getElementById('barRQ'), {
+  type: 'bar',
+  data: {
+    labels: CATS,
+    datasets: [
+      { label: 'CodeLlama',      data: [0.60,0.40,0.60,0.40,1.00,0.60,0.60], backgroundColor: 'rgba(129,140,248,0.8)', borderRadius: 5, borderSkipped: false },
+      { label: 'DeepSeek-Coder', data: [0.60,0.40,0.60,0.40,1.00,0.60,0.60], backgroundColor: 'rgba(52,211,153,0.8)',  borderRadius: 5, borderSkipped: false },
+      { label: 'StarCoder',      data: [0.60,0.40,0.60,0.40,1.00,0.60,0.60], backgroundColor: 'rgba(244,114,182,0.4)', borderRadius: 5, borderSkipped: false },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { padding: 10, font: { size: 10 } } } },
+    scales: {
+      x: { grid: gridLine, ticks: { font: { size: 9 } } },
+      y: { grid: gridLine, min: 0, max: 1, ticks: { callback: v => v.toFixed(1), font: { size: 10 } } }
+    }
+  }
+});
+</script>
+</body>
+</html>
