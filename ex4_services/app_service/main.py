@@ -39,7 +39,7 @@ class ChatResponse(BaseModel):
 
 
 HTML_PATH = os.path.join(os.path.dirname(__file__), "index.html")
-DASHBOARD_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "evaluation", "model_comparison_dashboard.html")
+DASHBOARD_PATH = os.path.join(os.path.dirname(__file__), "dashboard.html")
 
 
 @app.get("/", response_class=HTMLResponse)
