@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List
 import httpx, asyncio, time, os
+import guardrails as gr
 
 app = FastAPI(title="ShopBot App Service", version="4.0.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
@@ -36,6 +37,9 @@ class ChatResponse(BaseModel):
     orchestration_trace: dict
     metrics: dict
     error: bool = False
+    guardrail_triggered: bool = False
+    guardrail_name: str = ""
+    guardrail_severity: str = ""
 
 
 HTML_PATH = os.path.join(os.path.dirname(__file__), "index.html")
@@ -94,6 +98,23 @@ async def chat(request: ChatRequest):
     if not request.message.strip():
         raise HTTPException(status_code=400, detail="Message cannot be empty.")
 
+    # ── Guardrail G1 / G2 / G3: Input-side checks ──────────────────────────
+    input_guard = gr.check_input(request.message)
+    if input_guard.triggered:
+        return ChatResponse(
+            response=input_guard.safe_response,
+            model=request.model or "none",
+            rag_used=False,
+            retrieved_chunks=[],
+            orchestration_trace={"guardrail": input_guard.guardrail, "reason": input_guard.reason},
+            metrics={"rag_latency_ms": 0, "llm_latency_ms": 0, "total_latency_ms": 0,
+                     "tokens_used": 0, "chunks_retrieved": 0},
+            error=False,
+            guardrail_triggered=True,
+            guardrail_name=input_guard.guardrail,
+            guardrail_severity=input_guard.severity,
+        )
+
     pipeline_start = time.time()
     trace = {"steps": []}
 
@@ -123,6 +144,25 @@ async def chat(request: ChatRequest):
                     "step": 1, "service": "rag-service", "action": "retrieve",
                     "chunks_found": len(chunks), "latency_ms": rag_ms
                 })
+
+                # ── Guardrail G4: Insufficient Context ─────────────────────
+                top_sim = chunks[0]["similarity_score"] if chunks else 0.0
+                ctx_guard = gr.check_output(request.message, "", chunks, top_sim)
+                if ctx_guard.triggered:
+                    return ChatResponse(
+                        response=ctx_guard.safe_response,
+                        model=request.model or "none",
+                        rag_used=True,
+                        retrieved_chunks=chunks,
+                        orchestration_trace={"guardrail": ctx_guard.guardrail, "reason": ctx_guard.reason, "steps": trace["steps"]},
+                        metrics={"rag_latency_ms": rag_ms, "llm_latency_ms": 0,
+                                 "total_latency_ms": int((time.time()-pipeline_start)*1000),
+                                 "tokens_used": 0, "chunks_retrieved": len(chunks)},
+                        error=False,
+                        guardrail_triggered=True,
+                        guardrail_name=ctx_guard.guardrail,
+                        guardrail_severity=ctx_guard.severity,
+                    )
             except Exception as e:
                 trace["steps"].append({"step": 1, "service": "rag-service", "error": str(e)})
 
@@ -156,8 +196,20 @@ async def chat(request: ChatRequest):
 
     total_ms = int((time.time() - pipeline_start) * 1000)
 
+    raw_response = llm_data.get("text", "")
+
+    # ── Guardrail G5: Response Sanity ───────────────────────────────────────
+    out_guard = gr.check_output(request.message, raw_response, chunks,
+                                chunks[0]["similarity_score"] if chunks else 0.0)
+    if out_guard.triggered and out_guard.guardrail == "G5_RESPONSE_SANITY":
+        final_response = out_guard.safe_response
+        g_triggered, g_name, g_sev = True, out_guard.guardrail, out_guard.severity
+    else:
+        final_response = raw_response
+        g_triggered, g_name, g_sev = False, "", ""
+
     return ChatResponse(
-        response=llm_data.get("text", ""),
+        response=final_response,
         model=llm_data.get("model", request.model),
         rag_used=request.use_rag and bool(context),
         retrieved_chunks=chunks,
@@ -170,6 +222,9 @@ async def chat(request: ChatRequest):
             "chunks_retrieved": len(chunks),
         },
         error=llm_data.get("error", False),
+        guardrail_triggered=g_triggered,
+        guardrail_name=g_name,
+        guardrail_severity=g_sev,
     )
 
 
