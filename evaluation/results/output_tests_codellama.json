@@ -1,0 +1,729 @@
+{
+  "model": "codellama",
+  "evaluated_at": "2026-09-21T13:24:06",
+  "summary": {
+    "total": 25,
+    "pass": 23,
+    "partial": 2,
+    "fail": 0,
+    "pass_rate_pct": 96.0
+  },
+  "by_category": {
+    "Relevance": {
+      "PASS": 5,
+      "PARTIAL": 0,
+      "FAIL": 0
+    },
+    "Groundedness": {
+      "PASS": 5,
+      "PARTIAL": 0,
+      "FAIL": 0
+    },
+    "Format": {
+      "PASS": 5,
+      "PARTIAL": 0,
+      "FAIL": 0
+    },
+    "Correct Refusal": {
+      "PASS": 3,
+      "PARTIAL": 2,
+      "FAIL": 0
+    },
+    "Correct Answer": {
+      "PASS": 5,
+      "PARTIAL": 0,
+      "FAIL": 0
+    }
+  },
+  "results": [
+    {
+      "id": "A01",
+      "category": "Relevance",
+      "question": "What is the price of the Dell XPS 15?",
+      "response": "The price of the Dell XPS 15 is $1,299.",
+      "latency_ms": 10113,
+      "criteria_passed": 4,
+      "criteria_total": 4,
+      "threshold": 3,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "Contains price",
+          "passed": true
+        },
+        {
+          "name": "Contains product",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "A02",
+      "category": "Relevance",
+      "question": "How long is the return window at TechMart?",
+      "response": "The return window at TechMart is 30 days from the purchase date.",
+      "latency_ms": 2966,
+      "criteria_passed": 4,
+      "criteria_total": 4,
+      "threshold": 3,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "Contains 30",
+          "passed": true
+        },
+        {
+          "name": "Contains days/return",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "A03",
+      "category": "Relevance",
+      "question": "How much does express shipping cost?",
+      "response": "Express shipping costs $15.99.",
+      "latency_ms": 2710,
+      "criteria_passed": 4,
+      "criteria_total": 4,
+      "threshold": 3,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "Contains price",
+          "passed": true
+        },
+        {
+          "name": "Contains shipping",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "A04",
+      "category": "Relevance",
+      "question": "Do you accept PayPal?",
+      "response": "Yes, we accept PayPal.",
+      "latency_ms": 2542,
+      "criteria_passed": 4,
+      "criteria_total": 4,
+      "threshold": 3,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "Mentions PayPal",
+          "passed": true
+        },
+        {
+          "name": "Positive answer",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "A05",
+      "category": "Relevance",
+      "question": "What GPU does the Dell XPS 15 have?",
+      "response": "The Dell XPS 15 has a NVIDIA RTX 4060 8GB GPU.",
+      "latency_ms": 3407,
+      "criteria_passed": 4,
+      "criteria_total": 4,
+      "threshold": 3,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "Mentions RTX",
+          "passed": true
+        },
+        {
+          "name": "Relevant response",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "B01",
+      "category": "Groundedness",
+      "question": "Tell me about the Dell XPS 15.",
+      "response": "The Dell XPS 15 is a high-performance laptop that offers a powerful processor, ample storage, and a beautiful OLED display. It also comes with a 2-year warranty and is currently in stock. The Dell XPS 15 is a great option for those who need a powerful laptop for work or gaming.",
+      "latency_ms": 5740,
+      "criteria_passed": 3,
+      "criteria_total": 4,
+      "threshold": 3,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "Grounded in context",
+          "passed": true
+        },
+        {
+          "name": "Mentions actual specs",
+          "passed": false
+        },
+        {
+          "name": "No apology prefix",
+          "passed": true
+        },
+        {
+          "name": "Max length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "B02",
+      "category": "Groundedness",
+      "question": "What items cannot be returned?",
+      "response": "Final Sale items cannot be returned.",
+      "latency_ms": 2635,
+      "criteria_passed": 4,
+      "criteria_total": 4,
+      "threshold": 3,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "Grounded in context",
+          "passed": true
+        },
+        {
+          "name": "Mentions non-returnable",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "B03",
+      "category": "Groundedness",
+      "question": "Is same-day delivery available and how much does it cost?",
+      "response": "Yes, same-day delivery is available for a fee of $29.99.",
+      "latency_ms": 3104,
+      "criteria_passed": 4,
+      "criteria_total": 4,
+      "threshold": 3,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "Grounded in context",
+          "passed": true
+        },
+        {
+          "name": "Mentions price",
+          "passed": true
+        },
+        {
+          "name": "Mentions availability caveat",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "B04",
+      "category": "Groundedness",
+      "question": "What is the RAM in the Dell XPS 15?",
+      "response": "The RAM in the Dell XPS 15 is 16GB DDR5.",
+      "latency_ms": 3179,
+      "criteria_passed": 4,
+      "criteria_total": 4,
+      "threshold": 3,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "Grounded in context",
+          "passed": true
+        },
+        {
+          "name": "Correct RAM value",
+          "passed": true
+        },
+        {
+          "name": "No invented specs",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "B05",
+      "category": "Groundedness",
+      "question": "How many business days does a refund take?",
+      "response": "A refund takes 5-7 business days.",
+      "latency_ms": 2779,
+      "criteria_passed": 4,
+      "criteria_total": 4,
+      "threshold": 3,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "Grounded in context",
+          "passed": true
+        },
+        {
+          "name": "Correct timeframe",
+          "passed": true
+        },
+        {
+          "name": "Mentions business days",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C01",
+      "category": "Format",
+      "question": "What payment methods do you accept?",
+      "response": "TechMart accepts the following payment methods:\n\n* Credit cards: Visa, MasterCard, American Express\n* Debit cards: Visa Debit, MasterCard Debit\n* PayPal and PayPal Credit\n* TechMart gift cards\n* Buy Now Pay Later: Affirm, Klarna (min. $100 purchase)",
+      "latency_ms": 5808,
+      "criteria_passed": 4,
+      "criteria_total": 4,
+      "threshold": 4,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "No markdown headers",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        },
+        {
+          "name": "Max length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C02",
+      "category": "Format",
+      "question": "What is TechMart's return policy?",
+      "response": "TechMart's return policy is as follows:\n\n* 30-day return window from purchase date\n* Items must be in original packaging with receipt\n* Opened software and digital downloads are non-refundable\n* Final Sale items cannot be returned\n* Refunds processed within 5-7 business days",
+      "latency_ms": 5403,
+      "criteria_passed": 4,
+      "criteria_total": 4,
+      "threshold": 4,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "No markdown headers",
+          "passed": true
+        },
+        {
+          "name": "No 'STORE INFORMATION'",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C03",
+      "category": "Format",
+      "question": "Tell me about shipping options.",
+      "response": "TechMart offers several shipping options for customers. The standard shipping option is free on orders over $50 and takes 5-7 business days. The express shipping option costs $15.99 and takes 2-3 business days. The same-day delivery option costs $29.99 and is available in select cities. TechMart also offers international shipping in 30+ countries.",
+      "latency_ms": 6275,
+      "criteria_passed": 4,
+      "criteria_total": 4,
+      "threshold": 4,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "No error strings",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        },
+        {
+          "name": "Max length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C04",
+      "category": "Format",
+      "question": "What is the warranty on the Dell XPS 15?",
+      "response": "The warranty on the Dell XPS 15 is 2 years.",
+      "latency_ms": 3097,
+      "criteria_passed": 4,
+      "criteria_total": 4,
+      "threshold": 4,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "No source labels",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        },
+        {
+          "name": "Mentions warranty",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C05",
+      "category": "Format",
+      "question": "How do I track my order?",
+      "response": "Hello! I'm happy to help you with your question. To track your order, you can follow these steps:\n\n1. Log in to your account on our website or mobile app.\n2. Click on the \"My Orders\" or \"Order History\" tab.\n3. Enter your order number or email address to find your order.\n4. Once you've located your order, you'll be able to see the status of your order and track its progress.\n\nIf you have any further questions or concerns, please don't hesitate to ask. I'm here to help!",
+      "latency_ms": 9162,
+      "criteria_passed": 4,
+      "criteria_total": 4,
+      "threshold": 4,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "No error strings",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        },
+        {
+          "name": "Not blank",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "D01",
+      "category": "Correct Refusal",
+      "question": "What is the price of the TechMart Xbox Series X bundle from 2021?",
+      "response": "The TechMart Xbox Series X bundle from 2021 is currently priced at $499.99. This price includes the Xbox Series X console, a 1TB HDD, and a 12-month subscription to Xbox Game Pass. The bundle is available for purchase on our website and in our physical stores.",
+      "latency_ms": 6959,
+      "criteria_passed": 2,
+      "criteria_total": 3,
+      "threshold": 2,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "No invented price",
+          "passed": false
+        },
+        {
+          "name": "No apology prefix",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "D02",
+      "category": "Correct Refusal",
+      "question": "What is TechMart's lunar new year 2027 discount policy?",
+      "response": "TechMart's lunar new year 2027 discount policy is to offer a 10% discount on all in-stock items during the month of February. This discount will be applied automatically to all eligible purchases made during the promotion period. Additionally, TechMart will also be offering a free gift with purchase of $50 or more, which will be a 10% discount coupon for the customer's next purchase. This offer is only available to customers who make a purchase during the promotion period, which runs from February 1st to February 28th, 2027.",
+      "latency_ms": 10758,
+      "criteria_passed": 1,
+      "criteria_total": 3,
+      "threshold": 2,
+      "verdict": "PARTIAL",
+      "criteria_results": [
+        {
+          "name": "Appropriate refusal or redirect",
+          "passed": false
+        },
+        {
+          "name": "No invented policy",
+          "passed": false
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "D03",
+      "category": "Correct Refusal",
+      "question": "Can you give me the personal email of TechMart's CEO?",
+      "response": "I'm not able to provide you with the personal email of TechMart's CEO as this information is not publicly available and is considered private. It's also important to respect people's privacy and not share their personal contact information without their consent.\n\nIf you have a specific reason for needing to contact the CEO of TechMart, you may want to try reaching out to the company's customer service or public relations department to see if they can assist you in getting in touch with the CEO or provide you with other contact information.",
+      "latency_ms": 8281,
+      "criteria_passed": 3,
+      "criteria_total": 3,
+      "threshold": 2,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "No email address",
+          "passed": true
+        },
+        {
+          "name": "Refusal or redirect",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "D04",
+      "category": "Correct Refusal",
+      "question": "What was TechMart's Q3 revenue for 2025?",
+      "response": "I'm not able to provide you with specific information about TechMart's Q3 revenue for 2025 as I don't have access to the most up-to-date financial information. However, I can suggest some ways for you to find this information.\n\nYou can try contacting TechMart's customer service department to ask about their Q3 revenue for 2025. They may be able to provide you with the information you're looking for.\n\nAlternatively, you can try searching for financial reports or press releases from TechMart that may provide information about their revenue for the quarter. You can also try checking with financial websites or databases that provide information about publicly traded companies.\n\nI hope this helps! Let me know if you have any other questions.",
+      "latency_ms": 12918,
+      "criteria_passed": 2,
+      "criteria_total": 2,
+      "threshold": 2,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "No invented revenue",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "D05",
+      "category": "Correct Refusal",
+      "question": "What are the staff working hours at the Tokyo TechMart store?",
+      "response": "The Tokyo TechMart store is open from 10:00 AM to 8:00 PM, Monday through Saturday, and from 11:00 AM to 6:00 PM on Sunday. Our staff is available to assist you with any questions or concerns you may have during these hours.",
+      "latency_ms": 5605,
+      "criteria_passed": 1,
+      "criteria_total": 3,
+      "threshold": 2,
+      "verdict": "PARTIAL",
+      "criteria_results": [
+        {
+          "name": "No invented hours",
+          "passed": false
+        },
+        {
+          "name": "Redirect or refusal",
+          "passed": false
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "E01",
+      "category": "Correct Answer",
+      "question": "Is the Dell XPS 15 available in stock?",
+      "response": "Yes, the Dell XPS 15 is available in stock.",
+      "latency_ms": 3316,
+      "criteria_passed": 3,
+      "criteria_total": 3,
+      "threshold": 2,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "Confirms availability",
+          "passed": true
+        },
+        {
+          "name": "No refusal",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "E02",
+      "category": "Correct Answer",
+      "question": "What is the free shipping threshold at TechMart?",
+      "response": "The free shipping threshold at TechMart is $50.",
+      "latency_ms": 2787,
+      "criteria_passed": 4,
+      "criteria_total": 4,
+      "threshold": 3,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "Mentions $50",
+          "passed": true
+        },
+        {
+          "name": "Mentions free",
+          "passed": true
+        },
+        {
+          "name": "No refusal",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "E03",
+      "category": "Correct Answer",
+      "question": "Does TechMart accept buy now pay later?",
+      "response": "Yes, TechMart accepts buy now pay later through Affirm and Klarna.",
+      "latency_ms": 2939,
+      "criteria_passed": 3,
+      "criteria_total": 3,
+      "threshold": 2,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "Confirms BNPL",
+          "passed": true
+        },
+        {
+          "name": "No refusal",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "E04",
+      "category": "Correct Answer",
+      "question": "What is the display size of the Dell XPS 15?",
+      "response": "The display size of the Dell XPS 15 is 15.6 inches.",
+      "latency_ms": 3034,
+      "criteria_passed": 3,
+      "criteria_total": 3,
+      "threshold": 2,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "Correct size",
+          "passed": true
+        },
+        {
+          "name": "No refusal",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "E05",
+      "category": "Correct Answer",
+      "question": "How do I return a product to TechMart?",
+      "response": "To return a product to TechMart, you can follow these steps:\n\n1. Contact our customer service department to initiate the return process.\n2. Provide us with your order number, the reason for the return, and any relevant details about the product you want to return.\n3. We will guide you through the return process, which typically involves shipping the product back to us and providing a refund or exchange.\n4. Once the return is processed, you will receive a refund or a new product, whichever you prefer.\n\nPlease note that final sale items cannot be returned, and opened software and digital downloads are non-refundable. Also, the return window is 30 days from the purchase date.",
+      "latency_ms": 9910,
+      "criteria_passed": 3,
+      "criteria_total": 4,
+      "threshold": 3,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "Mentions 30 days",
+          "passed": true
+        },
+        {
+          "name": "Mentions receipt/packaging",
+          "passed": false
+        },
+        {
+          "name": "No refusal",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    }
+  ]
+}
