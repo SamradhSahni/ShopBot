@@ -1,0 +1,37 @@
+[
+  {
+    "guardrail": "G1",
+    "triggered": true,
+    "severity": "block"
+  },
+  {
+    "guardrail": "G2",
+    "triggered": true,
+    "severity": "redirect"
+  },
+  {
+    "guardrail": "G2b",
+    "triggered": true,
+    "severity": "redirect"
+  },
+  {
+    "guardrail": "G3",
+    "triggered": true,
+    "severity": "block"
+  },
+  {
+    "guardrail": "G3b",
+    "triggered": true,
+    "severity": "block"
+  },
+  {
+    "guardrail": "G4",
+    "triggered": true,
+    "severity": "refuse"
+  },
+  {
+    "guardrail": "G5",
+    "triggered": true,
+    "severity": "refuse"
+  }
+]

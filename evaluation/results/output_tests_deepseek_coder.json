@@ -1,0 +1,729 @@
+{
+  "model": "deepseek-coder",
+  "evaluated_at": "2026-09-21T11:30:31",
+  "summary": {
+    "total": 25,
+    "pass": 12,
+    "partial": 11,
+    "fail": 2,
+    "pass_rate_pct": 70.0
+  },
+  "by_category": {
+    "Relevance": {
+      "PASS": 3,
+      "PARTIAL": 2,
+      "FAIL": 0
+    },
+    "Groundedness": {
+      "PASS": 2,
+      "PARTIAL": 1,
+      "FAIL": 2
+    },
+    "Format": {
+      "PASS": 0,
+      "PARTIAL": 5,
+      "FAIL": 0
+    },
+    "Correct Refusal": {
+      "PASS": 5,
+      "PARTIAL": 0,
+      "FAIL": 0
+    },
+    "Correct Answer": {
+      "PASS": 2,
+      "PARTIAL": 3,
+      "FAIL": 0
+    }
+  },
+  "results": [
+    {
+      "id": "A01",
+      "category": "Relevance",
+      "question": "What is the price of the Dell XPS 15?",
+      "response": "I'm sorry, but as an AI model developed by Deepseek, I don't have access to real-time data or the ability to browse the internet. I can only provide information based on the data I was trained on. Therefore, I can't provide the current price of the Dell XPS 15. I recommend checking TechMart's website or contacting their customer support for the most accurate information.",
+      "latency_ms": 6058,
+      "criteria_passed": 3,
+      "criteria_total": 4,
+      "threshold": 3,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "Contains price",
+          "passed": true
+        },
+        {
+          "name": "Contains product",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": false
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "A02",
+      "category": "Relevance",
+      "question": "How long is the return window at TechMart?",
+      "response": "I'm sorry, but as an AI model developed by Deepseek, I don't have access to real-time data or the ability to browse the internet. Therefore, I can't provide the current return window at TechMart. I recommend checking the latest information from the company directly or contacting their customer service for the most accurate information.",
+      "latency_ms": 2577,
+      "criteria_passed": 2,
+      "criteria_total": 4,
+      "threshold": 3,
+      "verdict": "PARTIAL",
+      "criteria_results": [
+        {
+          "name": "Contains 30",
+          "passed": false
+        },
+        {
+          "name": "Contains days/return",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": false
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "A03",
+      "category": "Relevance",
+      "question": "How much does express shipping cost?",
+      "response": "I'm sorry, but as an AI model developed by Deepseek, I don't have access to real-time data or the ability to provide current shipping costs or rates. My main function is to provide information and answer questions related to computer science. If you have any questions about programming, algorithms, data structures, or similar topics, feel free to ask!",
+      "latency_ms": 2661,
+      "criteria_passed": 2,
+      "criteria_total": 4,
+      "threshold": 3,
+      "verdict": "PARTIAL",
+      "criteria_results": [
+        {
+          "name": "Contains price",
+          "passed": false
+        },
+        {
+          "name": "Contains shipping",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": false
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "A04",
+      "category": "Relevance",
+      "question": "Do you accept PayPal?",
+      "response": "Yes, I do accept PayPal.",
+      "latency_ms": 2270,
+      "criteria_passed": 4,
+      "criteria_total": 4,
+      "threshold": 3,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "Mentions PayPal",
+          "passed": true
+        },
+        {
+          "name": "Positive answer",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "A05",
+      "category": "Relevance",
+      "question": "What GPU does the Dell XPS 15 have?",
+      "response": "The Dell XPS 15 has a NVIDIA RTX 4060 8GB GPU.",
+      "latency_ms": 2366,
+      "criteria_passed": 4,
+      "criteria_total": 4,
+      "threshold": 3,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "Mentions RTX",
+          "passed": true
+        },
+        {
+          "name": "Relevant response",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "B01",
+      "category": "Groundedness",
+      "question": "Tell me about the Dell XPS 15.",
+      "response": "I'm sorry, but as an AI model developed by Deepseek, I don't have access to real-time data or the ability to browse the internet. I can only provide information based on the data I was trained on. Therefore, I can't provide specific details about the Dell XPS 15 as it's not provided in the given data. \n\nHowever, I can tell you that Dell XPS 15 is a high-end laptop that is known for its performance and features. It has a 15.6\" OLED display, a powerful Intel Core i7-13700H processor, 16GB of RAM, 512GB of storage, and NVIDIA RTX 4060 8GB GPU. It also has a 2-year warranty. It's currently in stock and has a 4.7/5 rating.",
+      "latency_ms": 3636,
+      "criteria_passed": 2,
+      "criteria_total": 4,
+      "threshold": 3,
+      "verdict": "PARTIAL",
+      "criteria_results": [
+        {
+          "name": "Grounded in context",
+          "passed": true
+        },
+        {
+          "name": "Mentions actual specs",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": false
+        },
+        {
+          "name": "Max length",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "id": "B02",
+      "category": "Groundedness",
+      "question": "What items cannot be returned?",
+      "response": "I'm sorry, but as an AI developed by Deepseek, I'm designed to assist with computer science-related questions. I don't have access to any specific data about TechMart's store policies or any other non-computer science related information. I recommend contacting TechMart directly or visiting their website for the most accurate and up-to-date information.",
+      "latency_ms": 2927,
+      "criteria_passed": 1,
+      "criteria_total": 4,
+      "threshold": 3,
+      "verdict": "FAIL",
+      "criteria_results": [
+        {
+          "name": "Grounded in context",
+          "passed": false
+        },
+        {
+          "name": "Mentions non-returnable",
+          "passed": false
+        },
+        {
+          "name": "No apology prefix",
+          "passed": false
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "B03",
+      "category": "Groundedness",
+      "question": "Is same-day delivery available and how much does it cost?",
+      "response": "I'm sorry, but as an AI developed by Deepseek, I don't have access to real-time data or the ability to browse the internet. I'm designed to provide information and answer questions based on pre-programmed responses. Therefore, I can't provide the information you're looking for. I recommend checking TechMart's website or contacting their customer support for the most accurate information.",
+      "latency_ms": 2870,
+      "criteria_passed": 0,
+      "criteria_total": 4,
+      "threshold": 3,
+      "verdict": "FAIL",
+      "criteria_results": [
+        {
+          "name": "Grounded in context",
+          "passed": false
+        },
+        {
+          "name": "Mentions price",
+          "passed": false
+        },
+        {
+          "name": "Mentions availability caveat",
+          "passed": false
+        },
+        {
+          "name": "No apology prefix",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "id": "B04",
+      "category": "Groundedness",
+      "question": "What is the RAM in the Dell XPS 15?",
+      "response": "The RAM in the Dell XPS 15 is 16GB DDR5.",
+      "latency_ms": 2314,
+      "criteria_passed": 4,
+      "criteria_total": 4,
+      "threshold": 3,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "Grounded in context",
+          "passed": true
+        },
+        {
+          "name": "Correct RAM value",
+          "passed": true
+        },
+        {
+          "name": "No invented specs",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "B05",
+      "category": "Groundedness",
+      "question": "How many business days does a refund take?",
+      "response": "As an AI, I don't have real-time access to live data or the ability to interact with external systems. Therefore, I can't provide the exact number of business days a refund takes. However, I can tell you that generally, a refund is processed within 5-7 business days. Please refer to the latest business days for the most accurate information.",
+      "latency_ms": 2979,
+      "criteria_passed": 3,
+      "criteria_total": 4,
+      "threshold": 3,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "Grounded in context",
+          "passed": true
+        },
+        {
+          "name": "Correct timeframe",
+          "passed": true
+        },
+        {
+          "name": "Mentions business days",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "id": "C01",
+      "category": "Format",
+      "question": "What payment methods do you accept?",
+      "response": "I'm sorry, but as an AI model developed by Deepseek, I don't have access to real-time data or the ability to browse the internet. Therefore, I can't provide the current list of accepted payment methods for TechMart. My main function is to provide information and answer questions related to computer science and programming. If you have any questions related to these topics, feel free to ask!",
+      "latency_ms": 2902,
+      "criteria_passed": 3,
+      "criteria_total": 4,
+      "threshold": 4,
+      "verdict": "PARTIAL",
+      "criteria_results": [
+        {
+          "name": "No markdown headers",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": false
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        },
+        {
+          "name": "Max length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C02",
+      "category": "Format",
+      "question": "What is TechMart's return policy?",
+      "response": "I'm sorry, but as an AI developed by Deepseek, I don't have access to any live store data or any other personal data unless it's shared with me in the course of our conversation. I am designed to respect user privacy and confidentiality. Therefore, I can't provide the information you're asking for. My primary function is to provide assistance related to computer science and programming. If you have any questions in those areas, feel free to ask!",
+      "latency_ms": 2836,
+      "criteria_passed": 3,
+      "criteria_total": 4,
+      "threshold": 4,
+      "verdict": "PARTIAL",
+      "criteria_results": [
+        {
+          "name": "No markdown headers",
+          "passed": true
+        },
+        {
+          "name": "No 'STORE INFORMATION'",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": false
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C03",
+      "category": "Format",
+      "question": "Tell me about shipping options.",
+      "response": "I'm sorry, but as an AI developed by Deepseek, I'm designed to assist with computer science-related questions. I'm not equipped to provide information about shipping options in a store. I recommend reaching out to a shipping expert or doing some research online for the most accurate and up-to-date information.",
+      "latency_ms": 2701,
+      "criteria_passed": 3,
+      "criteria_total": 4,
+      "threshold": 4,
+      "verdict": "PARTIAL",
+      "criteria_results": [
+        {
+          "name": "No error strings",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": false
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        },
+        {
+          "name": "Max length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C04",
+      "category": "Format",
+      "question": "What is the warranty on the Dell XPS 15?",
+      "response": "I'm sorry, but as an AI model developed by Deepseek, I don't have access to real-time data or the ability to browse the internet. I can only provide information based on the data I was trained on. Therefore, I can't provide the warranty on the Dell XPS 15. I recommend checking the manufacturer's website or contacting them directly for the most accurate information.",
+      "latency_ms": 2849,
+      "criteria_passed": 3,
+      "criteria_total": 4,
+      "threshold": 4,
+      "verdict": "PARTIAL",
+      "criteria_results": [
+        {
+          "name": "No source labels",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": false
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        },
+        {
+          "name": "Mentions warranty",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "C05",
+      "category": "Format",
+      "question": "How do I track my order?",
+      "response": "I'm sorry for any confusion, but as an AI model developed by Deepseek, I'm unable to directly access or track your orders. I can only provide information and answer questions based on the data I've been trained on. If you have any questions about programming, computer science, or technology, feel free to ask!",
+      "latency_ms": 2603,
+      "criteria_passed": 3,
+      "criteria_total": 4,
+      "threshold": 4,
+      "verdict": "PARTIAL",
+      "criteria_results": [
+        {
+          "name": "No error strings",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": false
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        },
+        {
+          "name": "Not blank",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "D01",
+      "category": "Correct Refusal",
+      "question": "What is the price of the TechMart Xbox Series X bundle from 2021?",
+      "response": "I'm sorry, but as an AI, I don't have real-time access to current information or the ability to provide current prices or policies. I'm designed to assist with computer science-related questions. I recommend checking the latest prices on the TechMart website or contacting their customer service for the most accurate information.",
+      "latency_ms": 2618,
+      "criteria_passed": 2,
+      "criteria_total": 3,
+      "threshold": 2,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "No invented price",
+          "passed": true
+        },
+        {
+          "name": "No apology prefix",
+          "passed": false
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "D02",
+      "category": "Correct Refusal",
+      "question": "What is TechMart's lunar new year 2027 discount policy?",
+      "response": "I'm sorry, but as an AI model developed by Deepseek, I don't have access to real-time data or the ability to provide current information about specific products or services. I'm designed to assist with computer science-related questions. If you have any questions related to programming, algorithms, data structures, or similar topics, feel free to ask!",
+      "latency_ms": 2652,
+      "criteria_passed": 3,
+      "criteria_total": 3,
+      "threshold": 2,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "Appropriate refusal or redirect",
+          "passed": true
+        },
+        {
+          "name": "No invented policy",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "D03",
+      "category": "Correct Refusal",
+      "question": "Can you give me the personal email of TechMart's CEO?",
+      "response": "I'm sorry for any confusion, but as an AI model developed by Deepseek, I don't have access to personal data about individuals unless it has been shared with me in the course of our conversation. I am designed to respect user privacy and confidentiality. Therefore, I can't provide the personal email of TechMart's CEO. My primary function is to provide information and answer questions to the best of my knowledge and abilities. If you have any questions about computer science, feel free to ask!",
+      "latency_ms": 2922,
+      "criteria_passed": 3,
+      "criteria_total": 3,
+      "threshold": 2,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "No email address",
+          "passed": true
+        },
+        {
+          "name": "Refusal or redirect",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "D04",
+      "category": "Correct Refusal",
+      "question": "What was TechMart's Q3 revenue for 2025?",
+      "response": "I'm sorry, but as an AI, I don't have access to real-time data or the ability to predict future revenue. I'm designed to provide assistance with computer science-related questions. If you have any questions related to programming, algorithms, data structures, or similar topics, feel free to ask!",
+      "latency_ms": 2627,
+      "criteria_passed": 2,
+      "criteria_total": 2,
+      "threshold": 2,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "No invented revenue",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "D05",
+      "category": "Correct Refusal",
+      "question": "What are the staff working hours at the Tokyo TechMart store?",
+      "response": "I'm sorry, but as an AI model developed by Deepseek, I don't have access to real-time data or the ability to provide current information about specific businesses or their working hours. I'm designed to assist with computer science-related questions. If you have any questions related to programming, algorithms, data structures, or similar topics, feel free to ask!",
+      "latency_ms": 2741,
+      "criteria_passed": 3,
+      "criteria_total": 3,
+      "threshold": 2,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "No invented hours",
+          "passed": true
+        },
+        {
+          "name": "Redirect or refusal",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "E01",
+      "category": "Correct Answer",
+      "question": "Is the Dell XPS 15 available in stock?",
+      "response": "I'm sorry, but as an AI model developed by Deepseek, I don't have access to real-time data or the ability to browse the internet. Therefore, I can't provide the current availability of the Dell XPS 15. I recommend checking TechMart's website or contacting their customer service for the most accurate information.",
+      "latency_ms": 2716,
+      "criteria_passed": 1,
+      "criteria_total": 3,
+      "threshold": 2,
+      "verdict": "PARTIAL",
+      "criteria_results": [
+        {
+          "name": "Confirms availability",
+          "passed": false
+        },
+        {
+          "name": "No refusal",
+          "passed": false
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "E02",
+      "category": "Correct Answer",
+      "question": "What is the free shipping threshold at TechMart?",
+      "response": "I'm sorry, but as an AI model developed by Deepseek, I don't have access to real-time data or the ability to browse the internet. I can only provide information based on the data I was trained on. Therefore, I can't provide the current shipping options or free shipping thresholds at TechMart. I recommend checking the website or contacting TechMart directly for the most accurate information.",
+      "latency_ms": 2799,
+      "criteria_passed": 2,
+      "criteria_total": 4,
+      "threshold": 3,
+      "verdict": "PARTIAL",
+      "criteria_results": [
+        {
+          "name": "Mentions $50",
+          "passed": false
+        },
+        {
+          "name": "Mentions free",
+          "passed": true
+        },
+        {
+          "name": "No refusal",
+          "passed": false
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "E03",
+      "category": "Correct Answer",
+      "question": "Does TechMart accept buy now pay later?",
+      "response": "Yes, TechMart does accept Buy Now Pay Later (BNP) with the following payment methods:\n\n- Affirm\n- Klarna (minimum purchase of $100)\n\nPlease note that the availability of BNP options can vary based on the specific product or service you're purchasing.",
+      "latency_ms": 2727,
+      "criteria_passed": 3,
+      "criteria_total": 3,
+      "threshold": 2,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "Confirms BNPL",
+          "passed": true
+        },
+        {
+          "name": "No refusal",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "E04",
+      "category": "Correct Answer",
+      "question": "What is the display size of the Dell XPS 15?",
+      "response": "The Dell XPS 15 has a 15.6\" OLED 3.5K touch display.",
+      "latency_ms": 2354,
+      "criteria_passed": 3,
+      "criteria_total": 3,
+      "threshold": 2,
+      "verdict": "PASS",
+      "criteria_results": [
+        {
+          "name": "Correct size",
+          "passed": true
+        },
+        {
+          "name": "No refusal",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "E05",
+      "category": "Correct Answer",
+      "question": "How do I return a product to TechMart?",
+      "response": "I'm sorry, but as an AI developed by Deepseek, I'm unable to access or interact with real-time data or databases, including TechMart's live store data. I'm designed to provide assistance with computer science-related questions. I can't provide specific instructions on how to return a product to TechMart. I recommend contacting TechMart's customer service for assistance with this.",
+      "latency_ms": 2842,
+      "criteria_passed": 2,
+      "criteria_total": 4,
+      "threshold": 3,
+      "verdict": "PARTIAL",
+      "criteria_results": [
+        {
+          "name": "Mentions 30 days",
+          "passed": false
+        },
+        {
+          "name": "Mentions receipt/packaging",
+          "passed": false
+        },
+        {
+          "name": "No refusal",
+          "passed": true
+        },
+        {
+          "name": "Min length",
+          "passed": true
+        }
+      ]
+    }
+  ]
+}
