@@ -120,15 +120,21 @@ def generate(request: GenerateRequest):
         "options": {
             "temperature": request.temperature,
             "num_predict": num_predict,
-            "num_ctx": 4096,   # Full context window for detailed responses
-            "num_thread": 4,   # 4 threads out of 6 vCPUs — fast without hogging the desktop
-            # Use newline-prefixed stop tokens so the model is never stopped immediately
-            # on its first token (TinyLlama often begins with "Customer:" or "ShopBoT:")
-            "stop": ["\n\n\n", "\nHuman:", "\nCustomer:", "\nUser:"],
+            "num_ctx": 4096,
+            "num_thread": 4,
+            # Layer 1: stop tokens — newline AND space-prefixed to catch both
+            # inline patterns ("...answer. Customer: ...") and newline patterns
+            "stop": [
+                "\n\n\n",
+                "\nHuman:", "\nCustomer:", "\nUser:", "\nShopBot:",
+                " Human:", " Customer:", " User:",
+                '"Customer:', '"Human:', '"User:',
+            ],
         }
     }
 
     start = time.time()
+    import re as _re
     try:
         print(f"[LLM] Calling Ollama at {OLLAMA_URL} with model '{model}'...")
         r = requests.post(f"{OLLAMA_URL}/api/generate", json=payload, timeout=180)
@@ -137,12 +143,27 @@ def generate(request: GenerateRequest):
         latency = int((time.time() - start) * 1000)
         raw_text = data.get("response", "").strip()
 
-        # Strip leading role-prefix that some small models inject
-        # e.g. "ShopBoT: Yes..." → "Yes..." / "Customer: ..." → "..."
-        import re as _re
-        raw_text = _re.sub(r'^(ShopBot|ShopBoT|Customer|Human|User)\s*:\s*', '', raw_text, flags=_re.IGNORECASE).strip()
+        # Layer 2: Post-process to strip roleplay artifacts
 
-        print(f"[LLM] Success! Generated {len(raw_text)} chars in {latency}ms")
+        # 2a. Strip leading role-prefix: "ShopBoT: ..." → "..."
+        raw_text = _re.sub(
+            r'^(ShopBot|ShopBoT|Customer|Human|User)\s*[:"]\s*"?\s*',
+            '', raw_text, flags=_re.IGNORECASE
+        ).strip()
+
+        # 2b. Cut at first Customer:/Human: continuation in the middle of text
+        # e.g. "Good answer. Customer: "follow up" ShopBot: ..." → "Good answer."
+        cut = _re.search(
+            r'(?<!\w)(Customer|Human|User)\s*:\s*["\']',
+            raw_text, flags=_re.IGNORECASE
+        )
+        if cut:
+            raw_text = raw_text[:cut.start()].strip()
+
+        # 2c. Remove trailing incomplete sentence if it ends mid-way after a quote
+        raw_text = raw_text.strip().rstrip('"').strip()
+
+        print(f"[LLM] Done — {len(raw_text)} chars in {latency}ms (model={model})")
         return GenerateResponse(
             text=raw_text,
             model=data.get("model", model),
