@@ -87,6 +87,12 @@ async def health():
     }
 
 
+@app.get("/info/guardrails")
+async def guardrails_info():
+    """Returns which guardrail backend and hub validators are active."""
+    return gr.get_engine_info()
+
+
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
     """

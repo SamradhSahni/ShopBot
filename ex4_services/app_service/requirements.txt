@@ -3,3 +3,4 @@ uvicorn[standard]
 requests
 pydantic
 httpx
+guardrails-ai>=0.5.0

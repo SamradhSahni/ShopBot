@@ -1,41 +1,84 @@
 """
-guardrails.py — ShopBot Guardrail Engine
-=========================================
-5 guardrails that protect ShopBot from undesirable inputs and outputs.
+guardrails.py — ShopBot Guardrail Engine (guardrails-ai powered)
+=================================================================
+Uses the official guardrails-ai library (https://www.guardrailsai.com)
+to implement 5 guardrails protecting ShopBot from undesirable inputs/outputs.
 
-  G1 — Input Length       : block messages > 500 characters
-  G2 — Off-Topic          : redirect questions outside TechMart scope
-  G3 — Prompt Injection   : block jailbreak / instruction-override attempts
-  G4 — Insufficient Context: refuse when RAG finds no relevant data
-  G5 — Response Sanity    : fallback when LLM output is empty or malformed
+  G1 — Input Length       : ValidLength hub validator (max 500 chars)
+  G2 — Off-Topic          : Custom OffTopicValidator (regex + scope check)
+  G3 — Prompt Injection   : DetectJailbreak hub validator + custom patterns
+  G4 — Insufficient Context: Custom InsufficientContextValidator
+  G5 — Response Sanity    : Custom ResponseSanityValidator
+
+Install on Ubuntu VM:
+    pip install guardrails-ai
+    guardrails hub install hub://guardrails/detect_jailbreak
+    guardrails hub install hub://guardrails/valid_length
+    guardrails hub install hub://guardrails/toxic_language
 
 Usage:
     from guardrails import GuardrailEngine, GuardrailResult
     engine = GuardrailEngine()
-
     result = engine.check_input(message)
-    if result.triggered:
-        return result.safe_response   # return to user directly
-
-    result = engine.check_output(question, llm_response, chunks)
     if result.triggered:
         return result.safe_response
 """
 
 import re
+import logging
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List, Optional, Any
+
+logger = logging.getLogger(__name__)
+
+# ── Try importing guardrails-ai library ───────────────────────────────────────
+try:
+    from guardrails import Guard
+    from guardrails.validator_base import (
+        FailResult,
+        PassResult,
+        ValidationResult,
+        Validator,
+        register_validator,
+    )
+    GUARDRAILS_AI_AVAILABLE = True
+    logger.info("guardrails-ai library loaded successfully")
+except ImportError:
+    GUARDRAILS_AI_AVAILABLE = False
+    logger.warning(
+        "guardrails-ai not installed. Falling back to built-in regex engine.\n"
+        "Install with: pip install guardrails-ai"
+    )
+
+# ── Try importing hub validators ───────────────────────────────────────────────
+DETECT_JAILBREAK_AVAILABLE = False
+VALID_LENGTH_AVAILABLE = False
+
+if GUARDRAILS_AI_AVAILABLE:
+    try:
+        from guardrails.hub import DetectJailbreak
+        DETECT_JAILBREAK_AVAILABLE = True
+        logger.info("Hub validator DetectJailbreak loaded")
+    except (ImportError, Exception):
+        logger.warning("DetectJailbreak hub validator not installed. Using regex fallback for G3.")
+
+    try:
+        from guardrails.hub import ValidLength
+        VALID_LENGTH_AVAILABLE = True
+        logger.info("Hub validator ValidLength loaded")
+    except (ImportError, Exception):
+        logger.warning("ValidLength hub validator not installed. Using built-in check for G1.")
 
 
-# ── Data Structures ───────────────────────────────────────────────────────────
+# ── Result dataclass ──────────────────────────────────────────────────────────
 
 @dataclass
 class GuardrailResult:
     triggered: bool
-    guardrail: str          # e.g. "G1_INPUT_LENGTH"
-    reason: str             # internal explanation
-    safe_response: str      # what to show the user
-    severity: str = "block" # "block" | "redirect" | "refuse" | "fallback"
+    guardrail: str
+    reason: str
+    safe_response: str
+    severity: str = "block"
     metadata: dict = field(default_factory=dict)
 
     @staticmethod
@@ -46,93 +89,242 @@ class GuardrailResult:
         )
 
 
-# ── Guardrail Engine ──────────────────────────────────────────────────────────
+# ── Custom Validators (guardrails-ai Validator subclasses) ────────────────────
+# These work whether guardrails-ai is installed or not — the base class
+# is shimmed below if the library is unavailable.
+
+if GUARDRAILS_AI_AVAILABLE:
+
+    # ── G2: Off-Topic Validator ───────────────────────────────────────────────
+    @register_validator(name="shopbot-off-topic", data_type="string")
+    class OffTopicValidator(Validator):
+        """
+        G2 — Rejects questions outside TechMart's e-commerce scope.
+        Checks against known off-topic patterns and verifies at least one
+        TechMart-related term is present in longer messages.
+        """
+        OFF_TOPIC_PATTERNS = [
+            r"\b(fever|medicine|doctor|symptom|diagnos|treat|hospital|disease|covid|pain|headache)\b",
+            r"\b(lawsuit|attorney|lawyer|sue|court|invest|stock market|crypto|bitcoin|loan|mortgage)\b",
+            r"\b(democrat|republican|election|president|prime minister|religion|god|pray|church|mosque)\b",
+            r"\b(write.*code|debug|algorithm|machine learning|neural network|train.*model|python tutorial)\b",
+            r"\b(suicide|self.harm|hurt myself|kill|weapon|illegal)\b",
+            r"\b(recipe|cook|bake|ingredient|cuisine)\b",
+            r"\b(essay|homework|assignment|thesis|dissertation|exam answer)\b",
+        ]
+        IN_SCOPE_TERMS = {
+            "product","laptop","phone","headphone","monitor","keyboard","tablet","camera",
+            "speaker","charger","cable","warranty","return","refund","shipping","delivery",
+            "order","payment","price","cost","stock","available","techmart","store","policy",
+            "exchange","receipt","invoice","discount","buy","purchase","track","cancel",
+            "dell","apple","sony","samsung","lenovo","hp","xps","macbook","ipad","galaxy",
+        }
+
+        def validate(self, value: str, metadata: dict = {}) -> ValidationResult:
+            msg_lower = value.lower()
+            for pattern in self.OFF_TOPIC_PATTERNS:
+                m = re.search(pattern, msg_lower)
+                if m:
+                    return FailResult(
+                        error_message=f"Off-topic pattern matched: '{m.group(0)}'",
+                        fix_value=(
+                            "I'm TechMart's ShopBot and I can only help with questions about "
+                            "our products, orders, shipping, returns, and store policies. "
+                            "Is there something about TechMart I can help you with?"
+                        ),
+                    )
+            # If long message with no TechMart terms → redirect
+            if len(value.split()) >= 4:
+                if not any(t in msg_lower for t in self.IN_SCOPE_TERMS):
+                    return FailResult(
+                        error_message="No TechMart-related terms found in message",
+                        fix_value=(
+                            "I'm TechMart's ShopBot — I specialise in helping with our "
+                            "products, orders, shipping, and return policies. "
+                            "Could you rephrase your question to relate to something TechMart offers?"
+                        ),
+                    )
+            return PassResult()
+
+    # ── G3: Prompt Injection Custom Patterns ──────────────────────────────────
+    @register_validator(name="shopbot-prompt-injection", data_type="string")
+    class PromptInjectionValidator(Validator):
+        """
+        G3 (Regex layer) — Catches prompt injection patterns not caught by
+        the ML-based DetectJailbreak hub validator.
+        """
+        PATTERNS = [
+            r"ignore\b.{0,25}\b(instructions?|rules?|prompt|context|system)",
+            r"disregard\b.{0,25}\b(instructions?|rules?|prompt|context|system)",
+            r"forget\b.{0,25}\b(everything|instructions?|rules?|context)",
+            r"pretend (you are|to be|you're|you have no|you don't have)",
+            r"you are now (a|an|the)",
+            r"act as (a|an) (different|unrestricted|evil|jailbreak)",
+            r"\bdan mode\b",
+            r"developer mode",
+            r"override\b.{0,20}\b(safety|rules|restrictions|guidelines)",
+            r"bypass\b.{0,20}\b(safety|filter|rules|restrictions)",
+            r"reveal\b.{0,20}\b(system prompt|instructions|rules)",
+            r"what (is|are) your (system prompt|instructions|rules)",
+        ]
+
+        def validate(self, value: str, metadata: dict = {}) -> ValidationResult:
+            msg_lower = value.lower()
+            for pattern in self.PATTERNS:
+                m = re.search(pattern, msg_lower)
+                if m:
+                    return FailResult(
+                        error_message=f"Prompt injection pattern: '{m.group(0)}'",
+                        fix_value=(
+                            "I can't process that request. "
+                            "I'm here to help with TechMart products and services!"
+                        ),
+                    )
+            return PassResult()
+
+    # ── G4: Insufficient Context Validator ───────────────────────────────────
+    @register_validator(name="shopbot-insufficient-context", data_type="string")
+    class InsufficientContextValidator(Validator):
+        """
+        G4 — Applied to LLM output when RAG retrieval finds no relevant chunks
+        or similarity is below threshold. Requires metadata:
+            metadata = {"chunks": [...], "top_similarity": float}
+        """
+        MIN_SIMILARITY = 0.30
+        MIN_CHUNKS = 1
+
+        def validate(self, value: str, metadata: dict = {}) -> ValidationResult:
+            chunks = metadata.get("chunks", [])
+            top_sim = metadata.get("top_similarity", 0.0)
+            if len(chunks) < self.MIN_CHUNKS or top_sim < self.MIN_SIMILARITY:
+                return FailResult(
+                    error_message=(
+                        f"Insufficient context: {len(chunks)} chunks, "
+                        f"top_similarity={top_sim:.3f} < {self.MIN_SIMILARITY}"
+                    ),
+                    fix_value=(
+                        "I don't have enough information in my knowledge base to answer that accurately. "
+                        "Please contact TechMart support at support@techmart.com or call 1-800-TECHMART."
+                    ),
+                )
+            return PassResult()
+
+    # ── G5: Response Sanity Validator ─────────────────────────────────────────
+    @register_validator(name="shopbot-response-sanity", data_type="string")
+    class ResponseSanityValidator(Validator):
+        """
+        G5 — Catches empty, too-short, or error-string LLM responses.
+        """
+        MIN_CHARS = 20
+        ERROR_PREFIXES = ["error:", "exception:", "traceback", "500 internal"]
+
+        def validate(self, value: str, metadata: dict = {}) -> ValidationResult:
+            stripped = (value or "").strip()
+            if not stripped:
+                return FailResult(
+                    error_message="LLM returned empty response",
+                    fix_value="I wasn't able to generate a response. Please try again.",
+                )
+            if len(stripped) < self.MIN_CHARS:
+                return FailResult(
+                    error_message=f"Response too short: {len(stripped)} chars",
+                    fix_value="I received an incomplete response. Please rephrase and try again.",
+                )
+            for prefix in self.ERROR_PREFIXES:
+                if stripped.lower().startswith(prefix):
+                    return FailResult(
+                        error_message=f"Response looks like an error: '{prefix}'",
+                        fix_value="I encountered a technical issue. Please try again in a moment.",
+                    )
+            return PassResult()
+
+
+# ── Guard Builder ─────────────────────────────────────────────────────────────
+
+def _build_input_guard() -> Optional["Guard"]:
+    """Build the input Guard chain: G1 → G3(hub) → G3(regex) → G2."""
+    if not GUARDRAILS_AI_AVAILABLE:
+        return None
+    validators = []
+
+    # G1: Length check
+    if VALID_LENGTH_AVAILABLE:
+        validators.append(ValidLength(min=1, max=500, on_fail="exception"))
+    # G3: Hub ML jailbreak detector (if available)
+    if DETECT_JAILBREAK_AVAILABLE:
+        validators.append(DetectJailbreak(on_fail="exception"))
+    # G3: Regex injection patterns
+    validators.append(PromptInjectionValidator(on_fail="fix"))
+    # G2: Off-topic check
+    validators.append(OffTopicValidator(on_fail="fix"))
+
+    guard = Guard()
+    for v in validators:
+        guard = guard.use(v)
+    return guard
+
+
+def _build_output_guard() -> Optional["Guard"]:
+    """Build the output Guard chain: G4 → G5."""
+    if not GUARDRAILS_AI_AVAILABLE:
+        return None
+    guard = Guard().use(
+        InsufficientContextValidator(on_fail="fix")
+    ).use(
+        ResponseSanityValidator(on_fail="fix")
+    )
+    return guard
+
+
+# ── GuardrailEngine ───────────────────────────────────────────────────────────
 
 class GuardrailEngine:
     """
-    Central guardrail engine. Call check_input() before sending to LLM,
-    and check_output() before returning the LLM response to the user.
+    Central guardrail engine.
+    Uses guardrails-ai Guards when available, falls back to built-in regex.
     """
 
-    # ── G1 Config ─────────────────────────────────────────────────────────────
     MAX_INPUT_CHARS = 500
 
-    # ── G2 Config — Off-Topic Keywords ────────────────────────────────────────
-    # Positive scope: must contain at least one TechMart-related concept
-    IN_SCOPE_TERMS = {
-        "product", "laptop", "phone", "headphone", "monitor", "keyboard",
-        "tablet", "camera", "speaker", "charger", "cable", "warranty",
-        "return", "refund", "shipping", "delivery", "order", "payment",
-        "price", "cost", "stock", "available", "techmart", "store",
-        "policy", "exchange", "receipt", "invoice", "discount", "offer",
-        "buy", "purchase", "track", "cancel", "replace", "repair",
-        "dell", "apple", "sony", "samsung", "lenovo", "lg", "hp",
-        "xps", "macbook", "ipad", "airpods", "galaxy", "iphone",
-    }
-
-    # Topics clearly outside scope
-    OFF_TOPIC_PATTERNS = [
-        # Medical
-        r"\b(fever|medicine|doctor|symptom|diagnos|treat|hospital|drug|disease|covid|pain|headache|illness)\b",
-        # Legal / Financial
-        r"\b(lawsuit|attorney|lawyer|sue|court|tax|invest|stock market|crypto|bitcoin|loan|mortgage)\b",
-        # Politics / Religion
-        r"\b(democrat|republican|election|president|prime minister|religion|god|pray|church|mosque|temple)\b",
-        # Coding / General tech help
-        r"\b(write.*code|debug|algorithm|machine learning|neural network|train.*model|python tutorial|how to program)\b",
-        # Personal / Harmful
-        r"\b(suicide|self.harm|hurt myself|kill|weapon|drug|illegal)\b",
-        # Cooking / Recipes
-        r"\b(recipe|cook|bake|ingredient|cuisine)\b",
-        # Academic homework
-        r"\b(essay|homework|assignment|thesis|dissertation|exam|quiz)\b",
-    ]
-
-    # ── G3 Config — Prompt Injection Patterns ─────────────────────────────────
-    INJECTION_PATTERNS = [
+    # Fallback injection patterns (used when guardrails-ai not installed)
+    _FALLBACK_INJECTION = [
         r"ignore\b.{0,25}\b(instructions?|rules?|prompt|context|system)",
         r"disregard\b.{0,25}\b(instructions?|rules?|prompt|context|system)",
         r"forget\b.{0,25}\b(everything|instructions?|rules?|context)",
-        r"pretend (you are|to be|you're|you have no|you don't have)",
-        r"you are now (a|an|the)",
-        r"act as (a|an|the) (different|new|unrestricted|evil|jailbreak)",
-        r"jailbreak",
-        r"\bdan mode\b",
-        r"developer mode",
-        r"override\b.{0,20}\b(safety|rules|restrictions|guidelines|instructions)",
-        r"bypass\b.{0,20}\b(safety|filter|rules|restrictions)",
-        r"reveal\b.{0,20}\b(system prompt|instructions|rules|prompt|context)",
-        r"print\b.{0,20}\b(system prompt|full prompt|instructions)",
-        r"what (is|are) your (system prompt|instructions|rules)",
-        r"translate the above",
-        r"repeat.*system prompt",
+        r"pretend (you are|to be|you're)",
+        r"jailbreak", r"\bdan mode\b",
+        r"override\b.{0,20}\b(safety|rules|restrictions)",
     ]
+    _FALLBACK_OFFTOPIC = [
+        r"\b(fever|medicine|doctor|symptom|treat|hospital|disease)\b",
+        r"\b(lawsuit|attorney|crypto|bitcoin|loan|mortgage)\b",
+        r"\b(election|president|religion|god|pray|church)\b",
+        r"\b(recipe|cook|bake|ingredient)\b",
+        r"\b(essay|homework|assignment|thesis|exam answer)\b",
+    ]
+    _IN_SCOPE = {
+        "product","laptop","phone","headphone","monitor","warranty","return","refund",
+        "shipping","delivery","order","payment","price","cost","stock","techmart","store",
+        "policy","discount","buy","purchase","track","cancel","dell","apple","sony","samsung",
+    }
 
-    # ── G4 Config ─────────────────────────────────────────────────────────────
-    MIN_SIMILARITY_THRESHOLD = 0.30   # Below this → refuse
-    MIN_CHUNKS_REQUIRED = 1           # At least 1 chunk must be retrieved
+    def __init__(self):
+        self._input_guard = None
+        self._output_guard = None
+        if GUARDRAILS_AI_AVAILABLE:
+            try:
+                self._input_guard = _build_input_guard()
+                self._output_guard = _build_output_guard()
+                logger.info("guardrails-ai Guards built successfully")
+            except Exception as e:
+                logger.warning(f"Failed to build Guards: {e}. Using fallback.")
 
-    # ── G5 Config ─────────────────────────────────────────────────────────────
-    MIN_RESPONSE_CHARS = 20
-    ERROR_PREFIXES = ["error:", "exception:", "traceback", "500 internal"]
-
-    # ──────────────────────────────────────────────────────────────────────────
+    # ── Public API ────────────────────────────────────────────────────────────
 
     def check_input(self, message: str) -> GuardrailResult:
-        """
-        Run all input-side guardrails against the user's message.
-        Returns the first triggered GuardrailResult, or GuardrailResult.ok().
-        """
-        checks = [
-            self._g1_input_length,
-            self._g3_prompt_injection,
-            self._g2_off_topic,
-        ]
-        for check in checks:
-            result = check(message)
-            if result.triggered:
-                return result
-        return GuardrailResult.ok()
+        if self._input_guard is not None:
+            return self._check_with_guard(message, self._input_guard, "input")
+        return self._fallback_check_input(message)
 
     def check_output(
         self,
@@ -141,177 +333,138 @@ class GuardrailEngine:
         chunks: List[dict],
         top_similarity: float = 0.0,
     ) -> GuardrailResult:
-        """
-        Run all output-side guardrails.
-        Returns the first triggered GuardrailResult, or GuardrailResult.ok().
-        """
-        checks = [
-            lambda: self._g4_insufficient_context(question, chunks, top_similarity),
-            lambda: self._g5_response_sanity(response),
-        ]
-        for check in checks:
-            result = check()
-            if result.triggered:
-                return result
-        return GuardrailResult.ok()
+        if self._output_guard is not None:
+            metadata = {"chunks": chunks, "top_similarity": top_similarity}
+            return self._check_with_guard(response, self._output_guard, "output", metadata)
+        return self._fallback_check_output(question, response, chunks, top_similarity)
 
-    # ── G1: Input Length ──────────────────────────────────────────────────────
-    def _g1_input_length(self, message: str) -> GuardrailResult:
+    # ── guardrails-ai path ─────────────────────────────────────────────────────
+
+    def _check_with_guard(
+        self,
+        value: str,
+        guard: "Guard",
+        mode: str,
+        metadata: dict = {},
+    ) -> GuardrailResult:
+        try:
+            outcome = guard.validate(value, metadata=metadata)
+            if outcome.validation_passed:
+                return GuardrailResult.ok()
+
+            # A validator failed — extract the fixed value and error
+            fixed = outcome.validated_output or value
+            err = str(outcome.error) if hasattr(outcome, "error") else "validation failed"
+
+            # Detect which guardrail triggered from error message
+            guardrail_id = self._identify_guardrail(err, mode)
+            severity = {"G1": "block", "G2": "redirect", "G3": "block",
+                        "G4": "refuse", "G5": "fallback"}.get(guardrail_id[:2], "block")
+
+            return GuardrailResult(
+                triggered=True,
+                guardrail=guardrail_id,
+                reason=err,
+                safe_response=fixed,
+                severity=severity,
+            )
+
+        except Exception as e:
+            err_str = str(e)
+            # Some validators raise on failure (on_fail="exception")
+            guardrail_id = self._identify_guardrail(err_str, mode)
+            severity = {"G1": "block", "G3": "block"}.get(guardrail_id[:2], "block")
+
+            safe = {
+                "G1": f"Your message is too long. Please keep questions under {self.MAX_INPUT_CHARS} characters.",
+                "G3": "I can't process that request. I'm here to help with TechMart products and services!",
+            }.get(guardrail_id[:2], "That request cannot be processed.")
+
+            return GuardrailResult(
+                triggered=True,
+                guardrail=guardrail_id,
+                reason=err_str,
+                safe_response=safe,
+                severity=severity,
+            )
+
+    def _identify_guardrail(self, error_msg: str, mode: str) -> str:
+        el = error_msg.lower()
+        if "length" in el or "too long" in el or "max" in el:
+            return "G1_INPUT_LENGTH"
+        if "jailbreak" in el or "injection" in el or "override" in el or "ignore" in el:
+            return "G3_PROMPT_INJECTION"
+        if "off-topic" in el or "topic" in el or "scope" in el or "techmart" in el:
+            return "G2_OFF_TOPIC"
+        if "insufficient" in el or "context" in el or "similarity" in el or "chunk" in el:
+            return "G4_INSUFFICIENT_CONTEXT"
+        if "empty" in el or "short" in el or "sanity" in el:
+            return "G5_RESPONSE_SANITY"
+        return "G3_PROMPT_INJECTION" if mode == "input" else "G5_RESPONSE_SANITY"
+
+    # ── Fallback path (no guardrails-ai library) ──────────────────────────────
+
+    def _fallback_check_input(self, message: str) -> GuardrailResult:
+        # G1
         if len(message) > self.MAX_INPUT_CHARS:
             return GuardrailResult(
-                triggered=True,
-                guardrail="G1_INPUT_LENGTH",
-                severity="block",
-                reason=f"Message is {len(message)} chars — exceeds {self.MAX_INPUT_CHARS} limit",
-                safe_response=(
-                    f"Your message is too long ({len(message)} characters). "
-                    f"Please keep questions under {self.MAX_INPUT_CHARS} characters "
-                    f"so I can give you a focused answer."
-                ),
-                metadata={"message_length": len(message), "limit": self.MAX_INPUT_CHARS}
+                triggered=True, guardrail="G1_INPUT_LENGTH", severity="block",
+                reason=f"Message is {len(message)} chars — exceeds {self.MAX_INPUT_CHARS}",
+                safe_response=f"Your message is too long ({len(message)} characters). "
+                              f"Please keep questions under {self.MAX_INPUT_CHARS} characters.",
+            )
+        # G3
+        msg_lower = message.lower()
+        for pat in self._FALLBACK_INJECTION:
+            m = re.search(pat, msg_lower)
+            if m:
+                return GuardrailResult(
+                    triggered=True, guardrail="G3_PROMPT_INJECTION", severity="block",
+                    reason=f"Injection pattern: '{m.group(0)}'",
+                    safe_response="I can't process that request. I'm here to help with TechMart products!",
+                )
+        # G2
+        for pat in self._FALLBACK_OFFTOPIC:
+            m = re.search(pat, msg_lower)
+            if m:
+                return GuardrailResult(
+                    triggered=True, guardrail="G2_OFF_TOPIC", severity="redirect",
+                    reason=f"Off-topic pattern: '{m.group(0)}'",
+                    safe_response="I'm TechMart's ShopBot — I can only help with TechMart products, "
+                                  "orders, shipping, and return policies.",
+                )
+        if len(message.split()) >= 4 and not any(t in msg_lower for t in self._IN_SCOPE):
+            return GuardrailResult(
+                triggered=True, guardrail="G2_OFF_TOPIC", severity="redirect",
+                reason="No TechMart-related terms found",
+                safe_response="I'm TechMart's ShopBot — please ask about our products or services!",
             )
         return GuardrailResult.ok()
 
-    # ── G2: Off-Topic ─────────────────────────────────────────────────────────
-    def _g2_off_topic(self, message: str) -> GuardrailResult:
-        msg_lower = message.lower()
-
-        # Check for explicitly off-topic patterns
-        for pattern in self.OFF_TOPIC_PATTERNS:
-            if re.search(pattern, msg_lower):
-                matched = re.search(pattern, msg_lower).group(0)
-                return GuardrailResult(
-                    triggered=True,
-                    guardrail="G2_OFF_TOPIC",
-                    severity="redirect",
-                    reason=f"Matched off-topic pattern: '{matched}'",
-                    safe_response=(
-                        "I'm TechMart's ShopBot and I can only help with questions about "
-                        "our products, orders, shipping, returns, and store policies. "
-                        "For anything else, please contact the appropriate service. "
-                        "Is there something about TechMart I can help you with?"
-                    ),
-                    metadata={"matched_pattern": matched}
-                )
-
-        # If message has no TechMart-relevant terms AND is long enough to be a real question
-        if len(message.split()) >= 4:
-            has_scope = any(term in msg_lower for term in self.IN_SCOPE_TERMS)
-            if not has_scope:
-                return GuardrailResult(
-                    triggered=True,
-                    guardrail="G2_OFF_TOPIC",
-                    severity="redirect",
-                    reason="No TechMart-related terms found in message",
-                    safe_response=(
-                        "I'm TechMart's ShopBot — I specialise in helping with our "
-                        "products, orders, shipping, and return policies. "
-                        "Could you rephrase your question to relate to something we sell or a service we offer?"
-                    ),
-                    metadata={"in_scope_terms_found": 0}
-                )
-
-        return GuardrailResult.ok()
-
-    # ── G3: Prompt Injection ──────────────────────────────────────────────────
-    def _g3_prompt_injection(self, message: str) -> GuardrailResult:
-        msg_lower = message.lower()
-        for pattern in self.INJECTION_PATTERNS:
-            if re.search(pattern, msg_lower):
-                matched = re.search(pattern, msg_lower).group(0)
-                return GuardrailResult(
-                    triggered=True,
-                    guardrail="G3_PROMPT_INJECTION",
-                    severity="block",
-                    reason=f"Injection pattern detected: '{matched}'",
-                    safe_response=(
-                        "I can't process that request. "
-                        "I'm here to help with TechMart products and services — "
-                        "feel free to ask about products, orders, or policies!"
-                    ),
-                    metadata={"matched_pattern": matched}
-                )
-        return GuardrailResult.ok()
-
-    # ── G4: Insufficient Context ──────────────────────────────────────────────
-    def _g4_insufficient_context(
-        self, question: str, chunks: List[dict], top_similarity: float
+    def _fallback_check_output(
+        self, question: str, response: str, chunks: List[dict], top_sim: float
     ) -> GuardrailResult:
-        chunks_found = len(chunks)
-        best_sim = top_similarity
-
-        # If RAG retrieved nothing or very low similarity
-        if chunks_found < self.MIN_CHUNKS_REQUIRED or best_sim < self.MIN_SIMILARITY_THRESHOLD:
+        # G4
+        if len(chunks) < 1 or top_sim < 0.30:
             return GuardrailResult(
-                triggered=True,
-                guardrail="G4_INSUFFICIENT_CONTEXT",
-                severity="refuse",
-                reason=(
-                    f"Only {chunks_found} chunks retrieved, "
-                    f"top similarity={best_sim:.3f} (threshold={self.MIN_SIMILARITY_THRESHOLD})"
-                ),
-                safe_response=(
-                    "I don't have enough information in my knowledge base to answer that accurately. "
-                    "For this query, please contact TechMart support directly at support@techmart.com "
-                    "or call 1-800-TECHMART."
-                ),
-                metadata={
-                    "chunks_retrieved": chunks_found,
-                    "top_similarity": best_sim,
-                    "threshold": self.MIN_SIMILARITY_THRESHOLD
-                }
+                triggered=True, guardrail="G4_INSUFFICIENT_CONTEXT", severity="refuse",
+                reason=f"{len(chunks)} chunks, top_similarity={top_sim:.3f}",
+                safe_response="I don't have enough information to answer that accurately. "
+                              "Please contact support@techmart.com or call 1-800-TECHMART.",
+            )
+        # G5
+        stripped = (response or "").strip()
+        if not stripped or len(stripped) < 20:
+            return GuardrailResult(
+                triggered=True, guardrail="G5_RESPONSE_SANITY", severity="fallback",
+                reason=f"Response too short or empty ({len(stripped)} chars)",
+                safe_response="I wasn't able to generate a response. Please try again.",
             )
         return GuardrailResult.ok()
 
-    # ── G5: Response Sanity ───────────────────────────────────────────────────
-    def _g5_response_sanity(self, response: str) -> GuardrailResult:
-        if not response or not response.strip():
-            return GuardrailResult(
-                triggered=True,
-                guardrail="G5_RESPONSE_SANITY",
-                severity="fallback",
-                reason="LLM returned empty response",
-                safe_response=(
-                    "I wasn't able to generate a response right now. "
-                    "Please try again or rephrase your question."
-                ),
-                metadata={"response_length": 0}
-            )
 
-        stripped = response.strip()
+# ── Module-level convenience functions ────────────────────────────────────────
 
-        if len(stripped) < self.MIN_RESPONSE_CHARS:
-            return GuardrailResult(
-                triggered=True,
-                guardrail="G5_RESPONSE_SANITY",
-                severity="fallback",
-                reason=f"Response too short: {len(stripped)} chars",
-                safe_response=(
-                    "I received an incomplete response. "
-                    "Please try asking your question again."
-                ),
-                metadata={"response_length": len(stripped)}
-            )
-
-        resp_lower = stripped.lower()
-        for prefix in self.ERROR_PREFIXES:
-            if resp_lower.startswith(prefix):
-                return GuardrailResult(
-                    triggered=True,
-                    guardrail="G5_RESPONSE_SANITY",
-                    severity="fallback",
-                    reason=f"Response looks like an error: starts with '{prefix}'",
-                    safe_response=(
-                        "I encountered a technical issue generating a response. "
-                        "Please try again in a moment."
-                    ),
-                    metadata={"error_prefix": prefix}
-                )
-
-        return GuardrailResult.ok()
-
-
-# ── Convenience singleton ─────────────────────────────────────────────────────
 _engine = GuardrailEngine()
 
 
@@ -319,5 +472,19 @@ def check_input(message: str) -> GuardrailResult:
     return _engine.check_input(message)
 
 
-def check_output(question, response, chunks, top_similarity=0.0) -> GuardrailResult:
+def check_output(
+    question: str, response: str, chunks: List[dict], top_similarity: float = 0.0
+) -> GuardrailResult:
     return _engine.check_output(question, response, chunks, top_similarity)
+
+
+def get_engine_info() -> dict:
+    """Return info about which guardrail backend is active."""
+    return {
+        "guardrails_ai_available": GUARDRAILS_AI_AVAILABLE,
+        "detect_jailbreak_hub": DETECT_JAILBREAK_AVAILABLE,
+        "valid_length_hub": VALID_LENGTH_AVAILABLE,
+        "input_guard_active": _engine._input_guard is not None,
+        "output_guard_active": _engine._output_guard is not None,
+        "mode": "guardrails-ai" if GUARDRAILS_AI_AVAILABLE else "built-in fallback",
+    }
