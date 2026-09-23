@@ -122,7 +122,9 @@ def generate(request: GenerateRequest):
             "num_predict": num_predict,
             "num_ctx": 4096,   # Full context window for detailed responses
             "num_thread": 4,   # 4 threads out of 6 vCPUs — fast without hogging the desktop
-            "stop": ["\n\n\n", "Human:", "Customer:", "User:"],  # Stop on double-newline to avoid rambling
+            # Use newline-prefixed stop tokens so the model is never stopped immediately
+            # on its first token (TinyLlama often begins with "Customer:" or "ShopBoT:")
+            "stop": ["\n\n\n", "\nHuman:", "\nCustomer:", "\nUser:"],
         }
     }
 
@@ -133,14 +135,22 @@ def generate(request: GenerateRequest):
         r.raise_for_status()
         data = r.json()
         latency = int((time.time() - start) * 1000)
-        print(f"[LLM] Success! Generated in {latency}ms")
+        raw_text = data.get("response", "").strip()
+
+        # Strip leading role-prefix that some small models inject
+        # e.g. "ShopBoT: Yes..." → "Yes..." / "Customer: ..." → "..."
+        import re as _re
+        raw_text = _re.sub(r'^(ShopBot|ShopBoT|Customer|Human|User)\s*:\s*', '', raw_text, flags=_re.IGNORECASE).strip()
+
+        print(f"[LLM] Success! Generated {len(raw_text)} chars in {latency}ms")
         return GenerateResponse(
-            text=data.get("response", "").strip(),
+            text=raw_text,
             model=data.get("model", model),
             latency_ms=latency,
             tokens_used=data.get("eval_count", 0),
             prompt_tokens=data.get("prompt_eval_count", 0),
         )
+
     except requests.exceptions.ConnectionError as e:
         print(f"[LLM] ConnectionError to Ollama at {OLLAMA_URL}: {e}")
         return GenerateResponse(text="Cannot connect to Ollama. Is it running?", model=model,
