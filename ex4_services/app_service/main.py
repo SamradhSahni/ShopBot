@@ -154,7 +154,9 @@ async def chat(request: ChatRequest):
                 # ── Guardrail G4: Insufficient Context ─────────────────────
                 top_sim = chunks[0]["similarity_score"] if chunks else 0.0
                 ctx_guard = gr.check_output(request.message, "", chunks, top_sim)
-                if ctx_guard.triggered:
+                # Only block early if G4 (insufficient context) triggered —
+                # NOT if G5 fired on our empty placeholder string
+                if ctx_guard.triggered and ctx_guard.guardrail == "G4_INSUFFICIENT_CONTEXT":
                     return ChatResponse(
                         response=ctx_guard.safe_response,
                         model=request.model or "none",
@@ -169,6 +171,7 @@ async def chat(request: ChatRequest):
                         guardrail_name=ctx_guard.guardrail,
                         guardrail_severity=ctx_guard.severity,
                     )
+
             except Exception as e:
                 trace["steps"].append({"step": 1, "service": "rag-service", "error": str(e)})
 
