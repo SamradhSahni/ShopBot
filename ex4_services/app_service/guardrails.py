@@ -242,7 +242,11 @@ if GUARDRAILS_AI_AVAILABLE:
 # ── Guard Builder ─────────────────────────────────────────────────────────────
 
 def _build_input_guard() -> Optional["Guard"]:
-    """Build the input Guard chain: G1 → G3(hub) → G3(regex) → G2."""
+    """Build the input Guard chain: G1 → G3(hub) → G3(regex) → G2.
+    All validators use on_fail='exception' so failures always raise,
+    are caught by _check_with_guard, and return triggered=True reliably.
+    (on_fail='fix' causes validation_passed=True which silently swallows failures)
+    """
     if not GUARDRAILS_AI_AVAILABLE:
         return None
     validators = []
@@ -253,10 +257,10 @@ def _build_input_guard() -> Optional["Guard"]:
     # G3: Hub ML jailbreak detector (if available)
     if DETECT_JAILBREAK_AVAILABLE:
         validators.append(DetectJailbreak(on_fail="exception"))
-    # G3: Regex injection patterns
-    validators.append(PromptInjectionValidator(on_fail="fix"))
-    # G2: Off-topic check
-    validators.append(OffTopicValidator(on_fail="fix"))
+    # G3: Regex injection patterns — exception mode
+    validators.append(PromptInjectionValidator(on_fail="exception"))
+    # G2: Off-topic check — exception mode
+    validators.append(OffTopicValidator(on_fail="exception"))
 
     guard = Guard()
     for v in validators:
@@ -269,9 +273,9 @@ def _build_output_guard() -> Optional["Guard"]:
     if not GUARDRAILS_AI_AVAILABLE:
         return None
     guard = Guard().use(
-        InsufficientContextValidator(on_fail="fix")
+        InsufficientContextValidator(on_fail="exception")
     ).use(
-        ResponseSanityValidator(on_fail="fix")
+        ResponseSanityValidator(on_fail="exception")
     )
     return guard
 
@@ -347,45 +351,60 @@ class GuardrailEngine:
         mode: str,
         metadata: dict = {},
     ) -> GuardrailResult:
+        """
+        Run a Guard and map the result to GuardrailResult.
+        Uses on_fail='exception' semantics: failures always raise,
+        caught here, always returns triggered=True.
+        Also detects fix-based failures as a belt-and-suspenders check.
+        """
         try:
             outcome = guard.validate(value, metadata=metadata)
-            if outcome.validation_passed:
-                return GuardrailResult.ok()
 
-            # A validator failed — extract the fixed value and error
-            fixed = outcome.validated_output or value
-            err = str(outcome.error) if hasattr(outcome, "error") else "validation failed"
+            # Check 1: explicit validation failure flag
+            if not outcome.validation_passed:
+                fixed = outcome.validated_output or value
+                err = str(outcome.error) if hasattr(outcome, "error") and outcome.error else ""
+                if not err:
+                    # Detect from changed output (on_fail='fix' behaviour)
+                    err = f"Validator modified output from '{value[:40]}'"
+                guardrail_id = self._identify_guardrail(err or fixed, mode)
+                severity = {"G1": "block", "G2": "redirect", "G3": "block",
+                            "G4": "refuse", "G5": "fallback"}.get(guardrail_id[:2], "block")
+                return GuardrailResult(
+                    triggered=True, guardrail=guardrail_id,
+                    reason=err, safe_response=fixed, severity=severity,
+                )
 
-            # Detect which guardrail triggered from error message
-            guardrail_id = self._identify_guardrail(err, mode)
-            severity = {"G1": "block", "G2": "redirect", "G3": "block",
-                        "G4": "refuse", "G5": "fallback"}.get(guardrail_id[:2], "block")
+            # Check 2: output was silently changed by a fix validator
+            validated_out = outcome.validated_output or value
+            if validated_out and validated_out.strip() != value.strip() and len(validated_out) > 5:
+                guardrail_id = self._identify_guardrail(validated_out, mode)
+                severity = {"G1": "block", "G2": "redirect", "G3": "block",
+                            "G4": "refuse", "G5": "fallback"}.get(guardrail_id[:2], "block")
+                return GuardrailResult(
+                    triggered=True, guardrail=guardrail_id,
+                    reason="Validator fix applied", safe_response=validated_out, severity=severity,
+                )
 
-            return GuardrailResult(
-                triggered=True,
-                guardrail=guardrail_id,
-                reason=err,
-                safe_response=fixed,
-                severity=severity,
-            )
+            return GuardrailResult.ok()
 
         except Exception as e:
+            # on_fail='exception' path — validator raised, extract guardrail from message
             err_str = str(e)
-            # Some validators raise on failure (on_fail="exception")
             guardrail_id = self._identify_guardrail(err_str, mode)
-            severity = {"G1": "block", "G3": "block"}.get(guardrail_id[:2], "block")
-
-            safe = {
+            severity = {"G1": "block", "G2": "redirect", "G3": "block",
+                        "G4": "refuse", "G5": "fallback"}.get(guardrail_id[:2], "block")
+            safe_map = {
                 "G1": f"Your message is too long. Please keep questions under {self.MAX_INPUT_CHARS} characters.",
+                "G2": "I'm TechMart's ShopBot — I can only help with TechMart products, orders, shipping, and return policies.",
                 "G3": "I can't process that request. I'm here to help with TechMart products and services!",
-            }.get(guardrail_id[:2], "That request cannot be processed.")
-
+                "G4": "I don't have enough information to answer that. Contact support@techmart.com.",
+                "G5": "I wasn't able to generate a response. Please try again.",
+            }
+            safe = safe_map.get(guardrail_id[:2], "That request cannot be processed.")
             return GuardrailResult(
-                triggered=True,
-                guardrail=guardrail_id,
-                reason=err_str,
-                safe_response=safe,
-                severity=severity,
+                triggered=True, guardrail=guardrail_id,
+                reason=err_str, safe_response=safe, severity=severity,
             )
 
     def _identify_guardrail(self, error_msg: str, mode: str) -> str:
